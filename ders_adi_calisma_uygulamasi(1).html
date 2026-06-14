@@ -1,0 +1,3728 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Android Mobil Programlama Final - Çalışma Uygulaması</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #132033;
+      --muted: #60708a;
+      --line: #d9e2ef;
+      --primary: #1f5eff;
+      --primary-2: #0f3dbd;
+      --good: #138a44;
+      --bad: #c0392b;
+      --warn: #b46900;
+      --chip: #eef4ff;
+      --shadow: 0 18px 50px rgba(19,32,51,.10);
+      --code-bg: #101828;
+      --code-text: #eaf1ff;
+    }
+
+    body.dark {
+      --bg: #0b1220;
+      --card: #121b2e;
+      --text: #eef4ff;
+      --muted: #aebbd0;
+      --line: #26334b;
+      --primary: #80a7ff;
+      --primary-2: #b7ccff;
+      --good: #44d17a;
+      --bad: #ff7670;
+      --warn: #ffc46b;
+      --chip: #1b2a46;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --code-bg: #050812;
+      --code-text: #eaf1ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top left, rgba(31,94,255,.13), transparent 28%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      width: min(1180px, 94vw);
+      margin: 0 auto;
+      padding: 22px 0 44px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .titlebox {
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 36px);
+      letter-spacing: -.4px;
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .theme-btn {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      min-width: 132px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      min-height: 76px;
+      box-shadow: 0 8px 22px rgba(19,32,51,.06);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .stat strong {
+      font-size: 23px;
+    }
+
+    .toolbar {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr auto auto;
+      gap: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    select option {
+      color: #111827;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(31,94,255,.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .08s ease, filter .16s ease, opacity .16s ease;
+      white-space: nowrap;
+    }
+
+    button:hover { filter: brightness(.98); }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    .primary { background: var(--primary); color: #fff; }
+    body.dark .primary { color: #061025; }
+    .soft { background: var(--chip); color: var(--primary-2); border: 1px solid var(--line); }
+    .good { background: rgba(19,138,68,.12); color: var(--good); border: 1px solid rgba(19,138,68,.25); }
+    .bad { background: rgba(192,57,43,.12); color: var(--bad); border: 1px solid rgba(192,57,43,.25); }
+    .danger { background: rgba(192,57,43,.10); color: var(--bad); border: 1px solid rgba(192,57,43,.22); }
+
+    .progress-wrap {
+      height: 10px;
+      background: var(--chip);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 2px 0 18px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--good));
+      transition: width .25s ease;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 380px;
+      cursor: pointer;
+    }
+
+    .card-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 18px 20px 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--chip);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chip.term {
+      color: var(--primary-2);
+      font-size: 13px;
+    }
+
+    .chip.known { color: var(--good); }
+    .chip.unknown { color: var(--bad); }
+    .chip.pending { color: var(--warn); }
+
+    .question-area {
+      padding: 16px 20px 22px;
+    }
+
+    .question-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .question {
+      font-size: clamp(24px, 5vw, 42px);
+      line-height: 1.14;
+      margin: 0;
+      letter-spacing: -.6px;
+    }
+
+    .answer {
+      display: none;
+      border-top: 1px solid var(--line);
+      padding: 18px 20px 22px;
+      background: linear-gradient(180deg, transparent, rgba(31,94,255,.04));
+    }
+
+    .answer.show {
+      display: block;
+      animation: fade .18s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .answer h2 {
+      margin: 0 0 10px;
+      font-size: 17px;
+    }
+
+    .answer p {
+      margin: 8px 0;
+      line-height: 1.55;
+      font-size: 17px;
+    }
+
+    .answer .memory {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--chip);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .mini-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin: 16px 0 6px;
+    }
+
+    pre {
+      margin: 10px 0 0;
+      padding: 14px;
+      overflow-x: auto;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .linked {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .info-box {
+      background: rgba(127,139,163,.08);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .info-box b {
+      color: var(--text);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .empty {
+      display: none;
+      background: var(--card);
+      border: 1px dashed var(--line);
+      border-radius: 22px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 920px) {
+      header { grid-template-columns: 1fr; }
+      .theme-btn { width: 100%; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .toolbar { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: repeat(2, 1fr); }
+      .linked { grid-template-columns: 1fr; }
+      .card { min-height: 420px; }
+    }
+
+    @media (max-width: 520px) {
+      .app { width: min(100% - 22px, 1180px); padding-top: 12px; }
+      .titlebox, .toolbar, .card { border-radius: 18px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat { padding: 10px; min-height: 68px; }
+      .stat strong { font-size: 19px; }
+      .actions { grid-template-columns: 1fr; }
+      .question-area { padding: 14px 16px 18px; }
+      .card-top { padding: 14px 16px 2px; }
+      .answer { padding: 16px; }
+    }
+
+    @media print {
+      .toolbar, .actions, .theme-btn, .progress-wrap { display: none !important; }
+      body { background: #fff; color: #000; }
+      .app { width: 100%; }
+      .card, .titlebox, .stat { box-shadow: none; border-color: #999; }
+      .answer { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="titlebox">
+        <h1>Android Mobil Programlama Final Çalışma Uygulaması</h1>
+        <p class="subtitle">Kotlin + Android + Veritabanı + API + Firebase kavramları. Tüm kartlar tek dosyanın içinde, internet gerektirmez.</p>
+      </div>
+      <button id="themeBtn" class="theme-btn" type="button">🌙 Karanlık Tema</button>
+    </header>
+
+    <section class="stats" aria-label="Öğrenme istatistikleri">
+      <div class="stat"><span>Toplam Kart</span><strong id="totalCount">0</strong></div>
+      <div class="stat"><span>Aktif Kart</span><strong id="activeCount">0/0</strong></div>
+      <div class="stat"><span>Bitti</span><strong id="doneCount">0</strong></div>
+      <div class="stat"><span>Biliyorum</span><strong id="knownCount">0</strong></div>
+      <div class="stat"><span>Bilmiyorum</span><strong id="unknownCount">0</strong></div>
+    </section>
+
+    <div class="progress-wrap" title="Genel ilerleme">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="toolbar" aria-label="Filtreler ve arama">
+      <input id="searchInput" type="search" placeholder="Ara: Kotlin nedir, Firebase, null, kod, cevap içinden kelime..." autocomplete="off" />
+      <select id="categorySelect" aria-label="Bölüm filtresi"></select>
+      <button id="shuffleBtn" class="soft" type="button">🔀 Karıştır</button>
+      <button id="restartBtn" class="soft" type="button">⏮ Başa dön</button>
+    </section>
+
+    <main>
+      <section id="emptyState" class="empty">
+        <h2>Sonuç bulunamadı</h2>
+        <p>Arama kelimesini kısaltmayı veya bölüm filtresini “Tüm bölümler” yapmayı dene.</p>
+      </section>
+
+      <article id="card" class="card" title="Cevabı açmak/kapatmak için karta tıkla">
+        <div class="card-top">
+          <span class="chip term" id="termChip">Kavram</span>
+          <span class="chip" id="categoryChip">Bölüm</span>
+          <span class="chip" id="typeChip">Kart türü</span>
+          <span class="chip" id="pageChip">PDF sayfası</span>
+          <span class="chip pending" id="statusChip">Durum: İşaretlenmedi</span>
+        </div>
+
+        <div class="question-area">
+          <div class="question-label">Soru</div>
+          <p class="question" id="questionText"></p>
+        </div>
+
+        <div id="answerBox" class="answer">
+          <h2>Cevap</h2>
+          <p id="answerText"></p>
+
+          <div id="codeWrap" style="display:none;">
+            <div class="mini-title">Kod Parçası</div>
+            <pre><code id="codeText"></code></pre>
+          </div>
+
+          <div class="memory">
+            <div class="mini-title">Ezber Cümlesi</div>
+            <p id="memoryText"></p>
+          </div>
+
+          <div class="linked">
+            <div class="info-box"><b>Bağlı kavram:</b> <span id="linkedTerm"></span></div>
+            <div class="info-box"><b>Ana soru:</b> <span id="primaryQuestion"></span></div>
+          </div>
+        </div>
+      </article>
+
+      <section class="actions" aria-label="Kart işlemleri">
+        <button id="prevBtn" class="soft" type="button">← Geri</button>
+        <button id="showBtn" class="primary" type="button">Cevabı Göster</button>
+        <button id="nextBtn" class="soft" type="button">İleri →</button>
+        <button id="knowBtn" class="good" type="button">✓ Biliyorum</button>
+        <button id="dontKnowBtn" class="bad" type="button">✕ Bilmiyorum</button>
+        <button id="clearCurrentBtn" class="soft" type="button">Kartı Temizle</button>
+        <button id="resetProgressBtn" class="danger" type="button">Takibi Sıfırla</button>
+      </section>
+    </main>
+
+    <footer>
+      Kartlar PDF’deki tablolar, çok kısa ezber cevaplar ve kod parçaları esas alınarak hazırlanmıştır. Arama; soru, cevap, kavram, kategori ve kod içinden çalışır.
+    </footer>
+  </div>
+
+  <script>
+    const ALL_CARDS = [
+  {
+    "id": "r001a",
+    "question": "Kotlin nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Kotlin",
+    "answer": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Kotlin nedir?",
+    "ezber": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir."
+  },
+  {
+    "id": "r001v1",
+    "question": "Android uygulaması hangi dil ile yazılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Kotlin",
+    "answer": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Kotlin nedir?",
+    "ezber": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir."
+  },
+  {
+    "id": "r001v2",
+    "question": "Java yerine kullanılan modern dil nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Kotlin",
+    "answer": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Kotlin nedir?",
+    "ezber": "Android geliştirmede kullanılan modern, nesne yönelimli ve fonksiyonel özellikleri olan programlama dilidir. Java ile birlikte çalışabilir."
+  },
+  {
+    "id": "r002a",
+    "question": "Kotlin dosya uzantısı nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": ".kt",
+    "answer": "Kotlin kaynak kod dosyalarının uzantısı .kt şeklindedir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Kotlin dosya uzantısı nedir?",
+    "ezber": "Kotlin kaynak kod dosyalarının uzantısı .kt şeklindedir."
+  },
+  {
+    "id": "r002v1",
+    "question": "MainActivity.kt neyi ifade eder?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": ".kt",
+    "answer": "Kotlin kaynak kod dosyalarının uzantısı .kt şeklindedir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Kotlin dosya uzantısı nedir?",
+    "ezber": "Kotlin kaynak kod dosyalarının uzantısı .kt şeklindedir."
+  },
+  {
+    "id": "r003a",
+    "question": "main fonksiyonu ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "main",
+    "answer": "Konsol uygulamalarında programın başlangıç noktasıdır: fun main() { ... }",
+    "hint": "",
+    "code": "fun main() {\n    // Program buradan başlar\n}",
+    "page": 1,
+    "primaryQuestion": "main fonksiyonu ne işe yarar?",
+    "ezber": "Konsol uygulamalarında programın başlangıç noktasıdır: fun main() { ... }"
+  },
+  {
+    "id": "r003v1",
+    "question": "Program ilk hangi fonksiyondan çalışır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "main",
+    "answer": "Konsol uygulamalarında programın başlangıç noktasıdır: fun main() { ... }",
+    "hint": "",
+    "code": "fun main() {\n    // Program buradan başlar\n}",
+    "page": 1,
+    "primaryQuestion": "main fonksiyonu ne işe yarar?",
+    "ezber": "Konsol uygulamalarında programın başlangıç noktasıdır: fun main() { ... }"
+  },
+  {
+    "id": "r004a",
+    "question": "val nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "val",
+    "answer": "Değeri sonradan değiştirilemeyen sabit değişken tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "val nedir?",
+    "ezber": "Değeri sonradan değiştirilemeyen sabit değişken tanımlar."
+  },
+  {
+    "id": "r004v1",
+    "question": "Kotlin’de immutable değişken hangi anahtar kelimeyle tanımlanır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "val",
+    "answer": "Değeri sonradan değiştirilemeyen sabit değişken tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "val nedir?",
+    "ezber": "Değeri sonradan değiştirilemeyen sabit değişken tanımlar."
+  },
+  {
+    "id": "r005a",
+    "question": "var nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "var",
+    "answer": "Değeri sonradan değiştirilebilen değişken tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "var nedir?",
+    "ezber": "Değeri sonradan değiştirilebilen değişken tanımlar."
+  },
+  {
+    "id": "r005v1",
+    "question": "Mutable değişken hangi anahtar kelimeyle tanımlanır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "var",
+    "answer": "Değeri sonradan değiştirilebilen değişken tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "var nedir?",
+    "ezber": "Değeri sonradan değiştirilebilen değişken tanımlar."
+  },
+  {
+    "id": "r006a",
+    "question": "println ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "println",
+    "answer": "Ekrana/konsola çıktı yazdırır ve satır sonu ekler.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "println ne işe yarar?",
+    "ezber": "Ekrana/konsola çıktı yazdırır ve satır sonu ekler."
+  },
+  {
+    "id": "r006v1",
+    "question": "Konsola yazdırma komutu nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "println",
+    "answer": "Ekrana/konsola çıktı yazdırır ve satır sonu ekler.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "println ne işe yarar?",
+    "ezber": "Ekrana/konsola çıktı yazdırır ve satır sonu ekler."
+  },
+  {
+    "id": "r007a",
+    "question": "String veri tipi nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "String",
+    "answer": "Metinsel verileri tutar. Örnek: val ad: String = \"Ali\"",
+    "hint": "",
+    "code": "val ad: String = \"Ali\"",
+    "page": 1,
+    "primaryQuestion": "String veri tipi nedir?",
+    "ezber": "Metinsel verileri tutar. Örnek: val ad: String = \"Ali\""
+  },
+  {
+    "id": "r007v1",
+    "question": "Metin tutan veri tipi hangisidir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "String",
+    "answer": "Metinsel verileri tutar. Örnek: val ad: String = \"Ali\"",
+    "hint": "",
+    "code": "val ad: String = \"Ali\"",
+    "page": 1,
+    "primaryQuestion": "String veri tipi nedir?",
+    "ezber": "Metinsel verileri tutar. Örnek: val ad: String = \"Ali\""
+  },
+  {
+    "id": "r008a",
+    "question": "Int veri tipi nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Int",
+    "answer": "Tam sayıları tutar. Örnek: val yas: Int = 18",
+    "hint": "",
+    "code": "val yas: Int = 18",
+    "page": 1,
+    "primaryQuestion": "Int veri tipi nedir?",
+    "ezber": "Tam sayıları tutar. Örnek: val yas: Int = 18"
+  },
+  {
+    "id": "r008v1",
+    "question": "Tam sayı için hangi veri tipi kullanılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Int",
+    "answer": "Tam sayıları tutar. Örnek: val yas: Int = 18",
+    "hint": "",
+    "code": "val yas: Int = 18",
+    "page": 1,
+    "primaryQuestion": "Int veri tipi nedir?",
+    "ezber": "Tam sayıları tutar. Örnek: val yas: Int = 18"
+  },
+  {
+    "id": "r009a",
+    "question": "Double veri tipi nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Double",
+    "answer": "Ondalıklı sayıları tutar. Örnek: val fiyat: Double = 12.5",
+    "hint": "",
+    "code": "val fiyat: Double = 12.5",
+    "page": 1,
+    "primaryQuestion": "Double veri tipi nedir?",
+    "ezber": "Ondalıklı sayıları tutar. Örnek: val fiyat: Double = 12.5"
+  },
+  {
+    "id": "r009v1",
+    "question": "Ondalıklı sayı tipi hangisidir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Double",
+    "answer": "Ondalıklı sayıları tutar. Örnek: val fiyat: Double = 12.5",
+    "hint": "",
+    "code": "val fiyat: Double = 12.5",
+    "page": 1,
+    "primaryQuestion": "Double veri tipi nedir?",
+    "ezber": "Ondalıklı sayıları tutar. Örnek: val fiyat: Double = 12.5"
+  },
+  {
+    "id": "r010a",
+    "question": "Boolean veri tipi nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Boolean",
+    "answer": "Sadece true veya false değerlerini tutar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Boolean veri tipi nedir?",
+    "ezber": "Sadece true veya false değerlerini tutar."
+  },
+  {
+    "id": "r010v1",
+    "question": "Mantıksal veri tipi nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Boolean",
+    "answer": "Sadece true veya false değerlerini tutar.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "Boolean veri tipi nedir?",
+    "ezber": "Sadece true veya false değerlerini tutar."
+  },
+  {
+    "id": "r011a",
+    "question": "null ne demektir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "null",
+    "answer": "Bir değişkenin değerinin olmadığını gösterir. Kotlin’de null güvenliği vardır.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "null ne demektir?",
+    "ezber": "Bir değişkenin değerinin olmadığını gösterir. Kotlin’de null güvenliği vardır."
+  },
+  {
+    "id": "r011v1",
+    "question": "Boş değer hangi ifade ile gösterilir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "null",
+    "answer": "Bir değişkenin değerinin olmadığını gösterir. Kotlin’de null güvenliği vardır.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "null ne demektir?",
+    "ezber": "Bir değişkenin değerinin olmadığını gösterir. Kotlin’de null güvenliği vardır."
+  },
+  {
+    "id": "r012a",
+    "question": "? operatörü ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?",
+    "answer": "Bir değişkenin null olabileceğini belirtir. Örnek: var ad: String? = null",
+    "hint": "",
+    "code": "var ad: String? = null",
+    "page": 1,
+    "primaryQuestion": "? operatörü ne işe yarar?",
+    "ezber": "Bir değişkenin null olabileceğini belirtir. Örnek: var ad: String? = null"
+  },
+  {
+    "id": "r012v1",
+    "question": "Nullable değişken nasıl tanımlanır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?",
+    "answer": "Bir değişkenin null olabileceğini belirtir. Örnek: var ad: String? = null",
+    "hint": "",
+    "code": "var ad: String? = null",
+    "page": 1,
+    "primaryQuestion": "? operatörü ne işe yarar?",
+    "ezber": "Bir değişkenin null olabileceğini belirtir. Örnek: var ad: String? = null"
+  },
+  {
+    "id": "r013a",
+    "question": "Elvis operatörü ?: ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?:",
+    "answer": "Sol taraf null ise sağdaki varsayılan değeri döndürür. Örnek: ad ?: \"Bilinmiyor\"",
+    "hint": "",
+    "code": "val sonuc = ad ?: \"Bilinmiyor\"",
+    "page": 1,
+    "primaryQuestion": "Elvis operatörü ?: ne işe yarar?",
+    "ezber": "Sol taraf null ise sağdaki varsayılan değeri döndürür. Örnek: ad ?: \"Bilinmiyor\""
+  },
+  {
+    "id": "r013v1",
+    "question": "Null gelirse varsayılan değer verme operatörü nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?:",
+    "answer": "Sol taraf null ise sağdaki varsayılan değeri döndürür. Örnek: ad ?: \"Bilinmiyor\"",
+    "hint": "",
+    "code": "val sonuc = ad ?: \"Bilinmiyor\"",
+    "page": 1,
+    "primaryQuestion": "Elvis operatörü ?: ne işe yarar?",
+    "ezber": "Sol taraf null ise sağdaki varsayılan değeri döndürür. Örnek: ad ?: \"Bilinmiyor\""
+  },
+  {
+    "id": "r014a",
+    "question": "Safe call operatörü ?. ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?.",
+    "answer": "Nesne null değilse özelliğe/metoda erişir, null ise hata vermez. Örnek: ad?.length",
+    "hint": "",
+    "code": "val uzunluk = ad?.length",
+    "page": 1,
+    "primaryQuestion": "Safe call operatörü ?. ne işe yarar?",
+    "ezber": "Nesne null değilse özelliğe/metoda erişir, null ise hata vermez. Örnek: ad?.length"
+  },
+  {
+    "id": "r014v1",
+    "question": "NullPointer hatasını önlemek için hangi operatör kullanılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "?.",
+    "answer": "Nesne null değilse özelliğe/metoda erişir, null ise hata vermez. Örnek: ad?.length",
+    "hint": "",
+    "code": "val uzunluk = ad?.length",
+    "page": 1,
+    "primaryQuestion": "Safe call operatörü ?. ne işe yarar?",
+    "ezber": "Nesne null değilse özelliğe/metoda erişir, null ise hata vermez. Örnek: ad?.length"
+  },
+  {
+    "id": "r015a",
+    "question": "when yapısı nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "when",
+    "answer": "Çoklu koşul yapısıdır; Java’daki switch’e benzer.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "when yapısı nedir?",
+    "ezber": "Çoklu koşul yapısıdır; Java’daki switch’e benzer."
+  },
+  {
+    "id": "r015v1",
+    "question": "switch yerine Kotlin’de ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "when",
+    "answer": "Çoklu koşul yapısıdır; Java’daki switch’e benzer.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "when yapısı nedir?",
+    "ezber": "Çoklu koşul yapısıdır; Java’daki switch’e benzer."
+  },
+  {
+    "id": "r016a",
+    "question": "fun anahtar kelimesi ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "fun",
+    "answer": "Fonksiyon tanımlamak için kullanılır. Örnek: fun topla(a:Int,b:Int):Int { return a+b }",
+    "hint": "",
+    "code": "fun topla(a: Int, b: Int): Int {\n    return a + b\n}",
+    "page": 1,
+    "primaryQuestion": "fun anahtar kelimesi ne işe yarar?",
+    "ezber": "Fonksiyon tanımlamak için kullanılır. Örnek: fun topla(a:Int,b:Int):Int { return a+b }"
+  },
+  {
+    "id": "r016v1",
+    "question": "Kotlin’de metot/fonksiyon nasıl başlar?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "fun",
+    "answer": "Fonksiyon tanımlamak için kullanılır. Örnek: fun topla(a:Int,b:Int):Int { return a+b }",
+    "hint": "",
+    "code": "fun topla(a: Int, b: Int): Int {\n    return a + b\n}",
+    "page": 1,
+    "primaryQuestion": "fun anahtar kelimesi ne işe yarar?",
+    "ezber": "Fonksiyon tanımlamak için kullanılır. Örnek: fun topla(a:Int,b:Int):Int { return a+b }"
+  },
+  {
+    "id": "r017a",
+    "question": "class nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "class",
+    "answer": "Nesne üretmek için kullanılan sınıf şablonudur.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "class nedir?",
+    "ezber": "Nesne üretmek için kullanılan sınıf şablonudur."
+  },
+  {
+    "id": "r017v1",
+    "question": "Kotlin’de sınıf tanımlama anahtar kelimesi nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "class",
+    "answer": "Nesne üretmek için kullanılan sınıf şablonudur.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "class nedir?",
+    "ezber": "Nesne üretmek için kullanılan sınıf şablonudur."
+  },
+  {
+    "id": "r018a",
+    "question": "data class nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "data class",
+    "answer": "Veri taşımak için kullanılan sınıftır; equals, toString, copy gibi fonksiyonları otomatik üretir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "data class nedir?",
+    "ezber": "Veri taşımak için kullanılan sınıftır; equals, toString, copy gibi fonksiyonları otomatik üretir."
+  },
+  {
+    "id": "r018v1",
+    "question": "Model sınıfı için hangi sınıf türü sık kullanılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "data class",
+    "answer": "Veri taşımak için kullanılan sınıftır; equals, toString, copy gibi fonksiyonları otomatik üretir.",
+    "hint": "",
+    "code": "",
+    "page": 1,
+    "primaryQuestion": "data class nedir?",
+    "ezber": "Veri taşımak için kullanılan sınıftır; equals, toString, copy gibi fonksiyonları otomatik üretir."
+  },
+  {
+    "id": "r019a",
+    "question": "object nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "object",
+    "answer": "Tek örnekli singleton nesne oluşturur veya anonim nesne tanımlamakta kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "object nedir?",
+    "ezber": "Tek örnekli singleton nesne oluşturur veya anonim nesne tanımlamakta kullanılır."
+  },
+  {
+    "id": "r019v1",
+    "question": "Singleton oluşturma anahtar kelimesi nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "object",
+    "answer": "Tek örnekli singleton nesne oluşturur veya anonim nesne tanımlamakta kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "object nedir?",
+    "ezber": "Tek örnekli singleton nesne oluşturur veya anonim nesne tanımlamakta kullanılır."
+  },
+  {
+    "id": "r020a",
+    "question": "listOf ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "listOf",
+    "answer": "Değiştirilemeyen liste oluşturur. Örnek: val sayilar = listOf(1,2,3)",
+    "hint": "",
+    "code": "val sayilar = listOf(1, 2, 3)",
+    "page": 2,
+    "primaryQuestion": "listOf ne işe yarar?",
+    "ezber": "Değiştirilemeyen liste oluşturur. Örnek: val sayilar = listOf(1,2,3)"
+  },
+  {
+    "id": "r020v1",
+    "question": "Immutable liste nasıl oluşturulur?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "listOf",
+    "answer": "Değiştirilemeyen liste oluşturur. Örnek: val sayilar = listOf(1,2,3)",
+    "hint": "",
+    "code": "val sayilar = listOf(1, 2, 3)",
+    "page": 2,
+    "primaryQuestion": "listOf ne işe yarar?",
+    "ezber": "Değiştirilemeyen liste oluşturur. Örnek: val sayilar = listOf(1,2,3)"
+  },
+  {
+    "id": "r021a",
+    "question": "mutableListOf ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "mutableListOf",
+    "answer": "Eleman eklenip silinebilen değiştirilebilir liste oluşturur.",
+    "hint": "",
+    "code": "val liste = mutableListOf(1, 2, 3)\nliste.add(4)",
+    "page": 2,
+    "primaryQuestion": "mutableListOf ne işe yarar?",
+    "ezber": "Eleman eklenip silinebilen değiştirilebilir liste oluşturur."
+  },
+  {
+    "id": "r021v1",
+    "question": "Mutable liste nasıl oluşturulur?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "mutableListOf",
+    "answer": "Eleman eklenip silinebilen değiştirilebilir liste oluşturur.",
+    "hint": "",
+    "code": "val liste = mutableListOf(1, 2, 3)\nliste.add(4)",
+    "page": 2,
+    "primaryQuestion": "mutableListOf ne işe yarar?",
+    "ezber": "Eleman eklenip silinebilen değiştirilebilir liste oluşturur."
+  },
+  {
+    "id": "r022a",
+    "question": "Array nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Array",
+    "answer": "Aynı türden verileri sıralı tutan dizi yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Array nedir?",
+    "ezber": "Aynı türden verileri sıralı tutan dizi yapısıdır."
+  },
+  {
+    "id": "r022v1",
+    "question": "Dizi yapısı Kotlin’de nasıl ifade edilir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "Array",
+    "answer": "Aynı türden verileri sıralı tutan dizi yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Array nedir?",
+    "ezber": "Aynı türden verileri sıralı tutan dizi yapısıdır."
+  },
+  {
+    "id": "r023a",
+    "question": "for döngüsü ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "for",
+    "answer": "Liste, dizi veya aralık üzerinde tekrar işlem yapmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "for döngüsü ne işe yarar?",
+    "ezber": "Liste, dizi veya aralık üzerinde tekrar işlem yapmak için kullanılır."
+  },
+  {
+    "id": "r023v1",
+    "question": "Koleksiyon elemanlarını gezmek için hangi döngü kullanılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "for",
+    "answer": "Liste, dizi veya aralık üzerinde tekrar işlem yapmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "for döngüsü ne işe yarar?",
+    "ezber": "Liste, dizi veya aralık üzerinde tekrar işlem yapmak için kullanılır."
+  },
+  {
+    "id": "r024a",
+    "question": "while döngüsü nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "while",
+    "answer": "Koşul doğru olduğu sürece çalışan döngüdür.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "while döngüsü nedir?",
+    "ezber": "Koşul doğru olduğu sürece çalışan döngüdür."
+  },
+  {
+    "id": "r024v1",
+    "question": "Koşula bağlı tekrar hangi döngüyle yapılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "while",
+    "answer": "Koşul doğru olduğu sürece çalışan döngüdür.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "while döngüsü nedir?",
+    "ezber": "Koşul doğru olduğu sürece çalışan döngüdür."
+  },
+  {
+    "id": "r025a",
+    "question": "Lambda ifade nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "lambda",
+    "answer": "İsimsiz fonksiyondur. Örnek: { x: Int -> x * 2 }",
+    "hint": "",
+    "code": "{ x: Int -> x * 2 }",
+    "page": 2,
+    "primaryQuestion": "Lambda ifade nedir?",
+    "ezber": "İsimsiz fonksiyondur. Örnek: { x: Int -> x * 2 }"
+  },
+  {
+    "id": "r025v1",
+    "question": "Fonksiyonu değişken gibi kullanmaya yarayan yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "lambda",
+    "answer": "İsimsiz fonksiyondur. Örnek: { x: Int -> x * 2 }",
+    "hint": "",
+    "code": "{ x: Int -> x * 2 }",
+    "page": 2,
+    "primaryQuestion": "Lambda ifade nedir?",
+    "ezber": "İsimsiz fonksiyondur. Örnek: { x: Int -> x * 2 }"
+  },
+  {
+    "id": "r026a",
+    "question": "Nesne nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "nesne",
+    "answer": "Bir sınıftan üretilen örnektir; özellik ve davranış taşır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Nesne nedir?",
+    "ezber": "Bir sınıftan üretilen örnektir; özellik ve davranış taşır."
+  },
+  {
+    "id": "r026v1",
+    "question": "Class ile object ilişkisi nasıl açıklanır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "nesne",
+    "answer": "Bir sınıftan üretilen örnektir; özellik ve davranış taşır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Nesne nedir?",
+    "ezber": "Bir sınıftan üretilen örnektir; özellik ve davranış taşır."
+  },
+  {
+    "id": "r027a",
+    "question": "Kalıtım nedir?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "kalıtım",
+    "answer": "Bir sınıfın başka bir sınıftan özellik ve fonksiyon almasıdır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Kalıtım nedir?",
+    "ezber": "Bir sınıfın başka bir sınıftan özellik ve fonksiyon almasıdır."
+  },
+  {
+    "id": "r027v1",
+    "question": "Inheritance ne demektir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "kalıtım",
+    "answer": "Bir sınıfın başka bir sınıftan özellik ve fonksiyon almasıdır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Kalıtım nedir?",
+    "ezber": "Bir sınıfın başka bir sınıftan özellik ve fonksiyon almasıdır."
+  },
+  {
+    "id": "r028a",
+    "question": "open ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "open",
+    "answer": "Kotlin’de sınıflar/fonksiyonlar varsayılan olarak finaldır; miras alınabilmesi veya override edilebilmesi için open yazılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "open ne işe yarar?",
+    "ezber": "Kotlin’de sınıflar/fonksiyonlar varsayılan olarak finaldır; miras alınabilmesi veya override edilebilmesi için open yazılır."
+  },
+  {
+    "id": "r028v1",
+    "question": "Kalıtım için sınıfın başına ne yazılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "open",
+    "answer": "Kotlin’de sınıflar/fonksiyonlar varsayılan olarak finaldır; miras alınabilmesi veya override edilebilmesi için open yazılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "open ne işe yarar?",
+    "ezber": "Kotlin’de sınıflar/fonksiyonlar varsayılan olarak finaldır; miras alınabilmesi veya override edilebilmesi için open yazılır."
+  },
+  {
+    "id": "r029a",
+    "question": "İki nokta : ne için kullanılır?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": ":",
+    "answer": "Tip belirtme ve kalıtım/arayüz belirtme için kullanılır. Örnek: val x: Int, class B: A()",
+    "hint": "",
+    "code": "val x: Int = 5\nclass B: A()",
+    "page": 2,
+    "primaryQuestion": "İki nokta : ne için kullanılır?",
+    "ezber": "Tip belirtme ve kalıtım/arayüz belirtme için kullanılır. Örnek: val x: Int, class B: A()"
+  },
+  {
+    "id": "r029v1",
+    "question": "Kotlin’de değişken tipi hangi işaretle belirtilir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": ":",
+    "answer": "Tip belirtme ve kalıtım/arayüz belirtme için kullanılır. Örnek: val x: Int, class B: A()",
+    "hint": "",
+    "code": "val x: Int = 5\nclass B: A()",
+    "page": 2,
+    "primaryQuestion": "İki nokta : ne için kullanılır?",
+    "ezber": "Tip belirtme ve kalıtım/arayüz belirtme için kullanılır. Örnek: val x: Int, class B: A()"
+  },
+  {
+    "id": "r030a",
+    "question": "try-catch ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "try-catch",
+    "answer": "Hata oluşabilecek kodu denemek ve hatayı yakalamak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "try-catch ne işe yarar?",
+    "ezber": "Hata oluşabilecek kodu denemek ve hatayı yakalamak için kullanılır."
+  },
+  {
+    "id": "r030v1",
+    "question": "Exception handling nasıl yapılır?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "try-catch",
+    "answer": "Hata oluşabilecek kodu denemek ve hatayı yakalamak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "try-catch ne işe yarar?",
+    "ezber": "Hata oluşabilecek kodu denemek ve hatayı yakalamak için kullanılır."
+  },
+  {
+    "id": "r031a",
+    "question": "package ne işe yarar?",
+    "type": "Ana soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "package",
+    "answer": "Sınıfları mantıksal klasör/isim alanı altında düzenler.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "package ne işe yarar?",
+    "ezber": "Sınıfları mantıksal klasör/isim alanı altında düzenler."
+  },
+  {
+    "id": "r031v1",
+    "question": "Dosyanın hangi uygulama paketine ait olduğunu ne gösterir?",
+    "type": "Alternatif soru",
+    "category": "1) Kotlin Temelleri",
+    "term": "package",
+    "answer": "Sınıfları mantıksal klasör/isim alanı altında düzenler.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "package ne işe yarar?",
+    "ezber": "Sınıfları mantıksal klasör/isim alanı altında düzenler."
+  },
+  {
+    "id": "r032a",
+    "question": "Android nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Android",
+    "answer": "Google tarafından geliştirilen, mobil cihazlarda çalışan işletim sistemi ve uygulama platformudur.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Android nedir?",
+    "ezber": "Google tarafından geliştirilen, mobil cihazlarda çalışan işletim sistemi ve uygulama platformudur."
+  },
+  {
+    "id": "r032v1",
+    "question": "Mobil programlama dersinde hedef platform nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Android",
+    "answer": "Google tarafından geliştirilen, mobil cihazlarda çalışan işletim sistemi ve uygulama platformudur.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Android nedir?",
+    "ezber": "Google tarafından geliştirilen, mobil cihazlarda çalışan işletim sistemi ve uygulama platformudur."
+  },
+  {
+    "id": "r033a",
+    "question": "Gradle nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Gradle",
+    "answer": "Android projelerinde derleme, bağımlılık yönetimi ve paketleme yapan build sistemidir.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Gradle nedir?",
+    "ezber": "Android projelerinde derleme, bağımlılık yönetimi ve paketleme yapan build sistemidir."
+  },
+  {
+    "id": "r033v1",
+    "question": "Kütüphane ekleme ve proje derleme hangi sistemle yapılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Gradle",
+    "answer": "Android projelerinde derleme, bağımlılık yönetimi ve paketleme yapan build sistemidir.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Gradle nedir?",
+    "ezber": "Android projelerinde derleme, bağımlılık yönetimi ve paketleme yapan build sistemidir."
+  },
+  {
+    "id": "r034a",
+    "question": "AndroidManifest.xml ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "AndroidManifest.xml",
+    "answer": "Uygulamanın bileşenlerini, izinlerini, launcher Activity bilgisini ve temel ayarlarını tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "AndroidManifest.xml ne işe yarar?",
+    "ezber": "Uygulamanın bileşenlerini, izinlerini, launcher Activity bilgisini ve temel ayarlarını tanımlar."
+  },
+  {
+    "id": "r034v1",
+    "question": "Uygulama izinleri ve Activity kayıtları hangi dosyadadır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "AndroidManifest.xml",
+    "answer": "Uygulamanın bileşenlerini, izinlerini, launcher Activity bilgisini ve temel ayarlarını tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "AndroidManifest.xml ne işe yarar?",
+    "ezber": "Uygulamanın bileşenlerini, izinlerini, launcher Activity bilgisini ve temel ayarlarını tanımlar."
+  },
+  {
+    "id": "r035a",
+    "question": "Activity nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Activity",
+    "answer": "Kullanıcının gördüğü bir ekranı temsil eden Android bileşenidir.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Activity nedir?",
+    "ezber": "Kullanıcının gördüğü bir ekranı temsil eden Android bileşenidir."
+  },
+  {
+    "id": "r035v1",
+    "question": "Android’de ekranı temsil eden yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Activity",
+    "answer": "Kullanıcının gördüğü bir ekranı temsil eden Android bileşenidir.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "Activity nedir?",
+    "ezber": "Kullanıcının gördüğü bir ekranı temsil eden Android bileşenidir."
+  },
+  {
+    "id": "r036a",
+    "question": "onCreate ne zaman çalışır?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "onCreate",
+    "answer": "Activity ilk oluşturulduğunda çalışan yaşam döngüsü metodudur. Genellikle arayüz burada bağlanır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "onCreate ne zaman çalışır?",
+    "ezber": "Activity ilk oluşturulduğunda çalışan yaşam döngüsü metodudur. Genellikle arayüz burada bağlanır."
+  },
+  {
+    "id": "r036v1",
+    "question": "Activity başlangıç metodu hangisidir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "onCreate",
+    "answer": "Activity ilk oluşturulduğunda çalışan yaşam döngüsü metodudur. Genellikle arayüz burada bağlanır.",
+    "hint": "",
+    "code": "",
+    "page": 2,
+    "primaryQuestion": "onCreate ne zaman çalışır?",
+    "ezber": "Activity ilk oluşturulduğunda çalışan yaşam döngüsü metodudur. Genellikle arayüz burada bağlanır."
+  },
+  {
+    "id": "r037a",
+    "question": "setContentView ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "setContentView",
+    "answer": "Activity’ye hangi XML layout dosyasının gösterileceğini bağlar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "setContentView ne işe yarar?",
+    "ezber": "Activity’ye hangi XML layout dosyasının gösterileceğini bağlar."
+  },
+  {
+    "id": "r037v1",
+    "question": "XML tasarım dosyası ekrana nasıl bağlanır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "setContentView",
+    "answer": "Activity’ye hangi XML layout dosyasının gösterileceğini bağlar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "setContentView ne işe yarar?",
+    "ezber": "Activity’ye hangi XML layout dosyasının gösterileceğini bağlar."
+  },
+  {
+    "id": "r038a",
+    "question": "View nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "View",
+    "answer": "Android arayüzündeki tüm görsel elemanların temel sınıfıdır. TextView, Button gibi elemanlar View’dır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "View nedir?",
+    "ezber": "Android arayüzündeki tüm görsel elemanların temel sınıfıdır. TextView, Button gibi elemanlar View’dır."
+  },
+  {
+    "id": "r038v1",
+    "question": "Buton/metin gibi UI elemanlarının temel sınıfı nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "View",
+    "answer": "Android arayüzündeki tüm görsel elemanların temel sınıfıdır. TextView, Button gibi elemanlar View’dır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "View nedir?",
+    "ezber": "Android arayüzündeki tüm görsel elemanların temel sınıfıdır. TextView, Button gibi elemanlar View’dır."
+  },
+  {
+    "id": "r039a",
+    "question": "res/layout klasörü ne içerir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "res/layout",
+    "answer": "XML arayüz tasarım dosyalarını içerir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "res/layout klasörü ne içerir?",
+    "ezber": "XML arayüz tasarım dosyalarını içerir."
+  },
+  {
+    "id": "r039v1",
+    "question": "Ekran tasarım dosyaları nerede tutulur?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "res/layout",
+    "answer": "XML arayüz tasarım dosyalarını içerir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "res/layout klasörü ne içerir?",
+    "ezber": "XML arayüz tasarım dosyalarını içerir."
+  },
+  {
+    "id": "r040a",
+    "question": "TextView ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "TextView",
+    "answer": "Ekranda metin göstermek için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "TextView ne işe yarar?",
+    "ezber": "Ekranda metin göstermek için kullanılır."
+  },
+  {
+    "id": "r040v1",
+    "question": "Kullanıcıya yazı gösteren bileşen nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "TextView",
+    "answer": "Ekranda metin göstermek için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "TextView ne işe yarar?",
+    "ezber": "Ekranda metin göstermek için kullanılır."
+  },
+  {
+    "id": "r041a",
+    "question": "EditText ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "EditText",
+    "answer": "Kullanıcıdan metin girişi almak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "EditText ne işe yarar?",
+    "ezber": "Kullanıcıdan metin girişi almak için kullanılır."
+  },
+  {
+    "id": "r041v1",
+    "question": "Kullanıcı veri girişi hangi bileşenle alınır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "EditText",
+    "answer": "Kullanıcıdan metin girişi almak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "EditText ne işe yarar?",
+    "ezber": "Kullanıcıdan metin girişi almak için kullanılır."
+  },
+  {
+    "id": "r042a",
+    "question": "Button nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Button",
+    "answer": "Tıklanabilir butondur; işlem başlatmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Button nedir?",
+    "ezber": "Tıklanabilir butondur; işlem başlatmak için kullanılır."
+  },
+  {
+    "id": "r042v1",
+    "question": "Tıklama işlemi için kullanılan UI elemanı nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Button",
+    "answer": "Tıklanabilir butondur; işlem başlatmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Button nedir?",
+    "ezber": "Tıklanabilir butondur; işlem başlatmak için kullanılır."
+  },
+  {
+    "id": "r043a",
+    "question": "ImageView ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ImageView",
+    "answer": "Resim/görsel göstermek için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "ImageView ne işe yarar?",
+    "ezber": "Resim/görsel göstermek için kullanılır."
+  },
+  {
+    "id": "r043v1",
+    "question": "Ekrana resim koyma bileşeni nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ImageView",
+    "answer": "Resim/görsel göstermek için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "ImageView ne işe yarar?",
+    "ezber": "Resim/görsel göstermek için kullanılır."
+  },
+  {
+    "id": "r044a",
+    "question": "LinearLayout nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "LinearLayout",
+    "answer": "View’ları dikey veya yatay olarak sırayla dizen layout yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "LinearLayout nedir?",
+    "ezber": "View’ları dikey veya yatay olarak sırayla dizen layout yapısıdır."
+  },
+  {
+    "id": "r044v1",
+    "question": "Elemanları alt alta veya yan yana dizerken hangi layout kullanılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "LinearLayout",
+    "answer": "View’ları dikey veya yatay olarak sırayla dizen layout yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "LinearLayout nedir?",
+    "ezber": "View’ları dikey veya yatay olarak sırayla dizen layout yapısıdır."
+  },
+  {
+    "id": "r045a",
+    "question": "ConstraintLayout nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ConstraintLayout",
+    "answer": "View’ları birbirine, ekrana veya kılavuzlara kısıtlarla bağlayan esnek layout yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "ConstraintLayout nedir?",
+    "ezber": "View’ları birbirine, ekrana veya kılavuzlara kısıtlarla bağlayan esnek layout yapısıdır."
+  },
+  {
+    "id": "r045v1",
+    "question": "Responsive ve esnek tasarım için hangi layout kullanılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ConstraintLayout",
+    "answer": "View’ları birbirine, ekrana veya kılavuzlara kısıtlarla bağlayan esnek layout yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "ConstraintLayout nedir?",
+    "ezber": "View’ları birbirine, ekrana veya kılavuzlara kısıtlarla bağlayan esnek layout yapısıdır."
+  },
+  {
+    "id": "r046a",
+    "question": "OnClickListener ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "OnClickListener",
+    "answer": "Bir View’a tıklanınca çalışacak kodu tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "OnClickListener ne işe yarar?",
+    "ezber": "Bir View’a tıklanınca çalışacak kodu tanımlar."
+  },
+  {
+    "id": "r046v1",
+    "question": "Butona tıklanınca işlem yapmak için ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "OnClickListener",
+    "answer": "Bir View’a tıklanınca çalışacak kodu tanımlar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "OnClickListener ne işe yarar?",
+    "ezber": "Bir View’a tıklanınca çalışacak kodu tanımlar."
+  },
+  {
+    "id": "r047a",
+    "question": "Toast nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Toast",
+    "answer": "Ekranın altında kısa süreli bilgilendirme mesajı gösterir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Toast nedir?",
+    "ezber": "Ekranın altında kısa süreli bilgilendirme mesajı gösterir."
+  },
+  {
+    "id": "r047v1",
+    "question": "Kısa kullanıcı mesajı hangi sınıfla gösterilir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Toast",
+    "answer": "Ekranın altında kısa süreli bilgilendirme mesajı gösterir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Toast nedir?",
+    "ezber": "Ekranın altında kısa süreli bilgilendirme mesajı gösterir."
+  },
+  {
+    "id": "r048a",
+    "question": "Intent ne işe yarar?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Intent",
+    "answer": "Activity başlatma, veri taşıma veya sistem bileşenleriyle iletişim kurma amacıyla kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Intent ne işe yarar?",
+    "ezber": "Activity başlatma, veri taşıma veya sistem bileşenleriyle iletişim kurma amacıyla kullanılır."
+  },
+  {
+    "id": "r048v1",
+    "question": "Bir ekrandan başka ekrana geçmek için ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Intent",
+    "answer": "Activity başlatma, veri taşıma veya sistem bileşenleriyle iletişim kurma amacıyla kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Intent ne işe yarar?",
+    "ezber": "Activity başlatma, veri taşıma veya sistem bileşenleriyle iletişim kurma amacıyla kullanılır."
+  },
+  {
+    "id": "r049a",
+    "question": "Bundle nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Bundle",
+    "answer": "Anahtar-değer şeklinde veri taşımaya yarar; Activity/Fragment arasında veri aktarımında kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Bundle nedir?",
+    "ezber": "Anahtar-değer şeklinde veri taşımaya yarar; Activity/Fragment arasında veri aktarımında kullanılır."
+  },
+  {
+    "id": "r049v1",
+    "question": "Intent veya Fragment ile veri taşırken kullanılan yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Bundle",
+    "answer": "Anahtar-değer şeklinde veri taşımaya yarar; Activity/Fragment arasında veri aktarımında kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Bundle nedir?",
+    "ezber": "Anahtar-değer şeklinde veri taşımaya yarar; Activity/Fragment arasında veri aktarımında kullanılır."
+  },
+  {
+    "id": "r050a",
+    "question": "Logcat nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Logcat",
+    "answer": "Android Studio’da uygulama loglarını ve hata mesajlarını izleme ekranıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Logcat nedir?",
+    "ezber": "Android Studio’da uygulama loglarını ve hata mesajlarını izleme ekranıdır."
+  },
+  {
+    "id": "r050v1",
+    "question": "Hatalar nereden takip edilir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Logcat",
+    "answer": "Android Studio’da uygulama loglarını ve hata mesajlarını izleme ekranıdır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Logcat nedir?",
+    "ezber": "Android Studio’da uygulama loglarını ve hata mesajlarını izleme ekranıdır."
+  },
+  {
+    "id": "r051a",
+    "question": "Emulator nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Emulator",
+    "answer": "Bilgisayarda sanal Android cihaz çalıştırmaya yarar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Emulator nedir?",
+    "ezber": "Bilgisayarda sanal Android cihaz çalıştırmaya yarar."
+  },
+  {
+    "id": "r051v1",
+    "question": "Telefon olmadan uygulama nasıl test edilir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "Emulator",
+    "answer": "Bilgisayarda sanal Android cihaz çalıştırmaya yarar.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Emulator nedir?",
+    "ezber": "Bilgisayarda sanal Android cihaz çalıştırmaya yarar."
+  },
+  {
+    "id": "r052a",
+    "question": "Responsive tasarım nedir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "responsive",
+    "answer": "Farklı ekran boyutlarına uyum sağlayan arayüz tasarımıdır. ConstraintLayout, dp/sp, uygun kaynak klasörleri kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Responsive tasarım nedir?",
+    "ezber": "Farklı ekran boyutlarına uyum sağlayan arayüz tasarımıdır. ConstraintLayout, dp/sp, uygun kaynak klasörleri kullanılır."
+  },
+  {
+    "id": "r052v1",
+    "question": "Uygulama farklı telefonlarda bozulmasın diye ne yapılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "responsive",
+    "answer": "Farklı ekran boyutlarına uyum sağlayan arayüz tasarımıdır. ConstraintLayout, dp/sp, uygun kaynak klasörleri kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Responsive tasarım nedir?",
+    "ezber": "Farklı ekran boyutlarına uyum sağlayan arayüz tasarımıdır. ConstraintLayout, dp/sp, uygun kaynak klasörleri kullanılır."
+  },
+  {
+    "id": "r053a",
+    "question": "İnternet izni nasıl verilir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "INTERNET izni",
+    "answer": "AndroidManifest.xml içinde <uses-permission android:name=\"android.permission.INTERNET\"/> yazılır.",
+    "hint": "",
+    "code": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "page": 3,
+    "primaryQuestion": "İnternet izni nasıl verilir?",
+    "ezber": "AndroidManifest.xml içinde <uses-permission android:name=\"android.permission.INTERNET\"/> yazılır."
+  },
+  {
+    "id": "r053v1",
+    "question": "API/Retrofit kullanmak için Manifest’e hangi izin eklenir?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "INTERNET izni",
+    "answer": "AndroidManifest.xml içinde <uses-permission android:name=\"android.permission.INTERNET\"/> yazılır.",
+    "hint": "",
+    "code": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "page": 3,
+    "primaryQuestion": "İnternet izni nasıl verilir?",
+    "ezber": "AndroidManifest.xml içinde <uses-permission android:name=\"android.permission.INTERNET\"/> yazılır."
+  },
+  {
+    "id": "r054a",
+    "question": "XML Android’de ne için kullanılır?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "XML",
+    "answer": "Arayüz tasarımlarını ve bazı kaynakları tanımlamak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "XML Android’de ne için kullanılır?",
+    "ezber": "Arayüz tasarımlarını ve bazı kaynakları tanımlamak için kullanılır."
+  },
+  {
+    "id": "r054v1",
+    "question": "Layout dosyaları hangi formatta yazılır?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "XML",
+    "answer": "Arayüz tasarımlarını ve bazı kaynakları tanımlamak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "XML Android’de ne için kullanılır?",
+    "ezber": "Arayüz tasarımlarını ve bazı kaynakları tanımlamak için kullanılır."
+  },
+  {
+    "id": "r055a",
+    "question": "Android’de ekran kavramı nasıl ifade edilir?",
+    "type": "Ana soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ekran",
+    "answer": "Genellikle Activity veya Fragment bir ekranı temsil eder.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Android’de ekran kavramı nasıl ifade edilir?",
+    "ezber": "Genellikle Activity veya Fragment bir ekranı temsil eder."
+  },
+  {
+    "id": "r055v1",
+    "question": "Bir uygulamada her sayfa neyle oluşturulur?",
+    "type": "Alternatif soru",
+    "category": "2) Android Temelleri ve Arayüz",
+    "term": "ekran",
+    "answer": "Genellikle Activity veya Fragment bir ekranı temsil eder.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "Android’de ekran kavramı nasıl ifade edilir?",
+    "ezber": "Genellikle Activity veya Fragment bir ekranı temsil eder."
+  },
+  {
+    "id": "r056a",
+    "question": "RecyclerView nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "RecyclerView",
+    "answer": "Çok sayıda veriyi liste/grid şeklinde performanslı göstermek için kullanılan bileşendir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "RecyclerView nedir?",
+    "ezber": "Çok sayıda veriyi liste/grid şeklinde performanslı göstermek için kullanılan bileşendir."
+  },
+  {
+    "id": "r056v1",
+    "question": "Listeleme işlemi için modern Android bileşeni nedir?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "RecyclerView",
+    "answer": "Çok sayıda veriyi liste/grid şeklinde performanslı göstermek için kullanılan bileşendir.",
+    "hint": "",
+    "code": "",
+    "page": 3,
+    "primaryQuestion": "RecyclerView nedir?",
+    "ezber": "Çok sayıda veriyi liste/grid şeklinde performanslı göstermek için kullanılan bileşendir."
+  },
+  {
+    "id": "r057a",
+    "question": "Adapter ne işe yarar?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Adapter",
+    "answer": "Veri kaynağı ile RecyclerView arasındaki köprüdür; veriyi satır görünümlerine bağlar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Adapter ne işe yarar?",
+    "ezber": "Veri kaynağı ile RecyclerView arasındaki köprüdür; veriyi satır görünümlerine bağlar."
+  },
+  {
+    "id": "r057v1",
+    "question": "Liste verisini arayüze bağlayan sınıf nedir?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Adapter",
+    "answer": "Veri kaynağı ile RecyclerView arasındaki köprüdür; veriyi satır görünümlerine bağlar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Adapter ne işe yarar?",
+    "ezber": "Veri kaynağı ile RecyclerView arasındaki köprüdür; veriyi satır görünümlerine bağlar."
+  },
+  {
+    "id": "r058a",
+    "question": "ViewHolder nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "ViewHolder",
+    "answer": "RecyclerView satırındaki View referanslarını tutar; performansı artırır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "ViewHolder nedir?",
+    "ezber": "RecyclerView satırındaki View referanslarını tutar; performansı artırır."
+  },
+  {
+    "id": "r058v1",
+    "question": "Satır elemanlarını cacheleyen yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "ViewHolder",
+    "answer": "RecyclerView satırındaki View referanslarını tutar; performansı artırır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "ViewHolder nedir?",
+    "ezber": "RecyclerView satırındaki View referanslarını tutar; performansı artırır."
+  },
+  {
+    "id": "r059a",
+    "question": "notifyDataSetChanged ne işe yarar?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "notifyDataSetChanged",
+    "answer": "Adapter verisi değiştiğinde RecyclerView’ın yenilenmesini sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "notifyDataSetChanged ne işe yarar?",
+    "ezber": "Adapter verisi değiştiğinde RecyclerView’ın yenilenmesini sağlar."
+  },
+  {
+    "id": "r059v1",
+    "question": "Liste verisi değişince ekranı yenilemek için hangi metot çağrılır?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "notifyDataSetChanged",
+    "answer": "Adapter verisi değiştiğinde RecyclerView’ın yenilenmesini sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "notifyDataSetChanged ne işe yarar?",
+    "ezber": "Adapter verisi değiştiğinde RecyclerView’ın yenilenmesini sağlar."
+  },
+  {
+    "id": "r060a",
+    "question": "Fragment nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Fragment",
+    "answer": "Activity içinde kullanılabilen, kendi yaşam döngüsü olan parça ekran yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Fragment nedir?",
+    "ezber": "Activity içinde kullanılabilen, kendi yaşam döngüsü olan parça ekran yapısıdır."
+  },
+  {
+    "id": "r060v1",
+    "question": "Tek Activity içinde birden fazla ekran/parça için ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Fragment",
+    "answer": "Activity içinde kullanılabilen, kendi yaşam döngüsü olan parça ekran yapısıdır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Fragment nedir?",
+    "ezber": "Activity içinde kullanılabilen, kendi yaşam döngüsü olan parça ekran yapısıdır."
+  },
+  {
+    "id": "r061a",
+    "question": "onCreateView ne işe yarar?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "onCreateView",
+    "answer": "Fragment’ın arayüzünü oluşturup döndüren metottur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "onCreateView ne işe yarar?",
+    "ezber": "Fragment’ın arayüzünü oluşturup döndüren metottur."
+  },
+  {
+    "id": "r061v1",
+    "question": "Fragment XML’i hangi metotta şişirilir/inflate edilir?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "onCreateView",
+    "answer": "Fragment’ın arayüzünü oluşturup döndüren metottur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "onCreateView ne işe yarar?",
+    "ezber": "Fragment’ın arayüzünü oluşturup döndüren metottur."
+  },
+  {
+    "id": "r062a",
+    "question": "Navigation component nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Navigation component",
+    "answer": "Fragment geçişlerini ve geri yığınını yönetmeyi kolaylaştıran Android Jetpack bileşenidir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Navigation component nedir?",
+    "ezber": "Fragment geçişlerini ve geri yığınını yönetmeyi kolaylaştıran Android Jetpack bileşenidir."
+  },
+  {
+    "id": "r062v1",
+    "question": "Fragmentler arası geçişi düzenleyen yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Navigation component",
+    "answer": "Fragment geçişlerini ve geri yığınını yönetmeyi kolaylaştıran Android Jetpack bileşenidir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Navigation component nedir?",
+    "ezber": "Fragment geçişlerini ve geri yığınını yönetmeyi kolaylaştıran Android Jetpack bileşenidir."
+  },
+  {
+    "id": "r063a",
+    "question": "navigation graph nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "navigation graph",
+    "answer": "Ekranlar/fragmentler ve aralarındaki geçişlerin tanımlandığı XML grafiktir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "navigation graph nedir?",
+    "ezber": "Ekranlar/fragmentler ve aralarındaki geçişlerin tanımlandığı XML grafiktir."
+  },
+  {
+    "id": "r063v1",
+    "question": "Hangi ekrandan hangi ekrana gidileceği nerede tanımlanır?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "navigation graph",
+    "answer": "Ekranlar/fragmentler ve aralarındaki geçişlerin tanımlandığı XML grafiktir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "navigation graph nedir?",
+    "ezber": "Ekranlar/fragmentler ve aralarındaki geçişlerin tanımlandığı XML grafiktir."
+  },
+  {
+    "id": "r064a",
+    "question": "Back stack nedir?",
+    "type": "Ana soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Back stack",
+    "answer": "Geri tuşuyla dönülecek ekranların tutulduğu yığındır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Back stack nedir?",
+    "ezber": "Geri tuşuyla dönülecek ekranların tutulduğu yığındır."
+  },
+  {
+    "id": "r064v1",
+    "question": "Android’de geri tuşu önceki ekrana nasıl döner?",
+    "type": "Alternatif soru",
+    "category": "3) RecyclerView, Fragment ve Navigation",
+    "term": "Back stack",
+    "answer": "Geri tuşuyla dönülecek ekranların tutulduğu yığındır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Back stack nedir?",
+    "ezber": "Geri tuşuyla dönülecek ekranların tutulduğu yığındır."
+  },
+  {
+    "id": "r065a",
+    "question": "SharedPreferences nedir?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "SharedPreferences",
+    "answer": "Küçük ve basit verileri anahtar-değer şeklinde kalıcı saklar. Örnek: giriş durumu, ayar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "SharedPreferences nedir?",
+    "ezber": "Küçük ve basit verileri anahtar-değer şeklinde kalıcı saklar. Örnek: giriş durumu, ayar."
+  },
+  {
+    "id": "r065v1",
+    "question": "Kullanıcı ayarları veya beni hatırla bilgisi nerede tutulur?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "SharedPreferences",
+    "answer": "Küçük ve basit verileri anahtar-değer şeklinde kalıcı saklar. Örnek: giriş durumu, ayar.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "SharedPreferences nedir?",
+    "ezber": "Küçük ve basit verileri anahtar-değer şeklinde kalıcı saklar. Örnek: giriş durumu, ayar."
+  },
+  {
+    "id": "r066a",
+    "question": "Room nedir?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "Room",
+    "answer": "SQLite üzerinde çalışan, Entity/DAO yapılarıyla yerel veritabanı işlemlerini kolaylaştıran Jetpack kütüphanesidir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Room nedir?",
+    "ezber": "SQLite üzerinde çalışan, Entity/DAO yapılarıyla yerel veritabanı işlemlerini kolaylaştıran Jetpack kütüphanesidir."
+  },
+  {
+    "id": "r066v1",
+    "question": "Android’de yerel veritabanı için hangi kütüphane kullanılır?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "Room",
+    "answer": "SQLite üzerinde çalışan, Entity/DAO yapılarıyla yerel veritabanı işlemlerini kolaylaştıran Jetpack kütüphanesidir.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Room nedir?",
+    "ezber": "SQLite üzerinde çalışan, Entity/DAO yapılarıyla yerel veritabanı işlemlerini kolaylaştıran Jetpack kütüphanesidir."
+  },
+  {
+    "id": "r067a",
+    "question": "Entity nedir?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "Entity",
+    "answer": "Room’da veritabanı tablosunu temsil eden veri sınıfıdır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Entity nedir?",
+    "ezber": "Room’da veritabanı tablosunu temsil eden veri sınıfıdır."
+  },
+  {
+    "id": "r067v1",
+    "question": "Room’da tablo hangi anotasyon/sınıf ile temsil edilir?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "Entity",
+    "answer": "Room’da veritabanı tablosunu temsil eden veri sınıfıdır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "Entity nedir?",
+    "ezber": "Room’da veritabanı tablosunu temsil eden veri sınıfıdır."
+  },
+  {
+    "id": "r068a",
+    "question": "DAO nedir?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "DAO",
+    "answer": "Database Access Object; Room’da veritabanı sorgu ve işlemlerinin yazıldığı arayüz/sınıftır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "DAO nedir?",
+    "ezber": "Database Access Object; Room’da veritabanı sorgu ve işlemlerinin yazıldığı arayüz/sınıftır."
+  },
+  {
+    "id": "r068v1",
+    "question": "Veritabanı işlemlerini yazdığımız katman nedir?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "DAO",
+    "answer": "Database Access Object; Room’da veritabanı sorgu ve işlemlerinin yazıldığı arayüz/sınıftır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "DAO nedir?",
+    "ezber": "Database Access Object; Room’da veritabanı sorgu ve işlemlerinin yazıldığı arayüz/sınıftır."
+  },
+  {
+    "id": "r069a",
+    "question": "@Insert ne işe yarar?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Insert",
+    "answer": "Room’da veritabanına yeni kayıt eklemek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Insert ne işe yarar?",
+    "ezber": "Room’da veritabanına yeni kayıt eklemek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r069v1",
+    "question": "Kayıt ekleme anotasyonu nedir?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Insert",
+    "answer": "Room’da veritabanına yeni kayıt eklemek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Insert ne işe yarar?",
+    "ezber": "Room’da veritabanına yeni kayıt eklemek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r070a",
+    "question": "@Delete ne işe yarar?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Delete",
+    "answer": "Room’da kayıt silmek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Delete ne işe yarar?",
+    "ezber": "Room’da kayıt silmek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r070v1",
+    "question": "Kayıt silme anotasyonu nedir?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Delete",
+    "answer": "Room’da kayıt silmek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Delete ne işe yarar?",
+    "ezber": "Room’da kayıt silmek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r071a",
+    "question": "@Update ne işe yarar?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Update",
+    "answer": "Room’da var olan kaydı güncellemek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Update ne işe yarar?",
+    "ezber": "Room’da var olan kaydı güncellemek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r071v1",
+    "question": "Kayıt güncelleme anotasyonu nedir?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Update",
+    "answer": "Room’da var olan kaydı güncellemek için kullanılan anotasyondur.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Update ne işe yarar?",
+    "ezber": "Room’da var olan kaydı güncellemek için kullanılan anotasyondur."
+  },
+  {
+    "id": "r072a",
+    "question": "@Query ne işe yarar?",
+    "type": "Ana soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Query",
+    "answer": "Room’da özel SQL sorguları yazmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Query ne işe yarar?",
+    "ezber": "Room’da özel SQL sorguları yazmak için kullanılır."
+  },
+  {
+    "id": "r072v1",
+    "question": "SELECT sorgusu hangi anotasyonla yazılır?",
+    "type": "Alternatif soru",
+    "category": "4) Yerel Veri Saklama ve Room",
+    "term": "@Query",
+    "answer": "Room’da özel SQL sorguları yazmak için kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 4,
+    "primaryQuestion": "@Query ne işe yarar?",
+    "ezber": "Room’da özel SQL sorguları yazmak için kullanılır."
+  },
+  {
+    "id": "r073a",
+    "question": "Model nedir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "Model",
+    "answer": "Veri ve iş kurallarını temsil eden katmandır. Veri sınıfları, repository veya veri kaynakları burada olabilir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Model nedir?",
+    "ezber": "Veri ve iş kurallarını temsil eden katmandır. Veri sınıfları, repository veya veri kaynakları burada olabilir."
+  },
+  {
+    "id": "r073v1",
+    "question": "MVVM/MVC’de veri katmanı hangisidir?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "Model",
+    "answer": "Veri ve iş kurallarını temsil eden katmandır. Veri sınıfları, repository veya veri kaynakları burada olabilir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Model nedir?",
+    "ezber": "Veri ve iş kurallarını temsil eden katmandır. Veri sınıfları, repository veya veri kaynakları burada olabilir."
+  },
+  {
+    "id": "r074a",
+    "question": "View nedir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "View",
+    "answer": "Kullanıcı arayüzünü temsil eder; Activity, Fragment ve XML layout bu katmandadır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "View nedir?",
+    "ezber": "Kullanıcı arayüzünü temsil eder; Activity, Fragment ve XML layout bu katmandadır."
+  },
+  {
+    "id": "r074v1",
+    "question": "Kullanıcının gördüğü katman hangisidir?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "View",
+    "answer": "Kullanıcı arayüzünü temsil eder; Activity, Fragment ve XML layout bu katmandadır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "View nedir?",
+    "ezber": "Kullanıcı arayüzünü temsil eder; Activity, Fragment ve XML layout bu katmandadır."
+  },
+  {
+    "id": "r075a",
+    "question": "ViewModel nedir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "ViewModel",
+    "answer": "View için gerekli veriyi tutar ve yaşam döngüsünden daha az etkilenir. UI ile veri katmanı arasında köprü görevi görür.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "ViewModel nedir?",
+    "ezber": "View için gerekli veriyi tutar ve yaşam döngüsünden daha az etkilenir. UI ile veri katmanı arasında köprü görevi görür."
+  },
+  {
+    "id": "r075v1",
+    "question": "MVVM’de ekran verisini tutan sınıf nedir?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "ViewModel",
+    "answer": "View için gerekli veriyi tutar ve yaşam döngüsünden daha az etkilenir. UI ile veri katmanı arasında köprü görevi görür.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "ViewModel nedir?",
+    "ezber": "View için gerekli veriyi tutar ve yaşam döngüsünden daha az etkilenir. UI ile veri katmanı arasında köprü görevi görür."
+  },
+  {
+    "id": "r076a",
+    "question": "LiveData nedir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "LiveData",
+    "answer": "Gözlemlenebilir veri tutar; veri değiştiğinde UI otomatik haberdar olur ve yaşam döngüsüne duyarlıdır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "LiveData nedir?",
+    "ezber": "Gözlemlenebilir veri tutar; veri değiştiğinde UI otomatik haberdar olur ve yaşam döngüsüne duyarlıdır."
+  },
+  {
+    "id": "r076v1",
+    "question": "UI’ı veri değişince otomatik güncelleyen yapı nedir?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "LiveData",
+    "answer": "Gözlemlenebilir veri tutar; veri değiştiğinde UI otomatik haberdar olur ve yaşam döngüsüne duyarlıdır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "LiveData nedir?",
+    "ezber": "Gözlemlenebilir veri tutar; veri değiştiğinde UI otomatik haberdar olur ve yaşam döngüsüne duyarlıdır."
+  },
+  {
+    "id": "r077a",
+    "question": "Coroutine nedir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "Coroutine",
+    "answer": "Uzun süren işleri ana thread’i kilitlemeden asenkron çalıştırmayı sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Coroutine nedir?",
+    "ezber": "Uzun süren işleri ana thread’i kilitlemeden asenkron çalıştırmayı sağlar."
+  },
+  {
+    "id": "r077v1",
+    "question": "Ağ/veritabanı işlemini donma olmadan yapmak için ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "Coroutine",
+    "answer": "Uzun süren işleri ana thread’i kilitlemeden asenkron çalıştırmayı sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Coroutine nedir?",
+    "ezber": "Uzun süren işleri ana thread’i kilitlemeden asenkron çalıştırmayı sağlar."
+  },
+  {
+    "id": "r078a",
+    "question": "launch ne işe yarar?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "launch",
+    "answer": "Coroutine başlatır; sonuç döndürmeden arka planda iş çalıştırır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "launch ne işe yarar?",
+    "ezber": "Coroutine başlatır; sonuç döndürmeden arka planda iş çalıştırır."
+  },
+  {
+    "id": "r078v1",
+    "question": "Coroutine başlatma fonksiyonu nedir?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "launch",
+    "answer": "Coroutine başlatır; sonuç döndürmeden arka planda iş çalıştırır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "launch ne işe yarar?",
+    "ezber": "Coroutine başlatır; sonuç döndürmeden arka planda iş çalıştırır."
+  },
+  {
+    "id": "r079a",
+    "question": "suspend ne demektir?",
+    "type": "Ana soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "suspend",
+    "answer": "Fonksiyonun coroutine içinde duraklatılıp devam edebileceğini belirtir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "suspend ne demektir?",
+    "ezber": "Fonksiyonun coroutine içinde duraklatılıp devam edebileceğini belirtir."
+  },
+  {
+    "id": "r079v1",
+    "question": "Coroutine içinde çağrılan asenkron fonksiyon nasıl tanımlanır?",
+    "type": "Alternatif soru",
+    "category": "5) MVVM, LiveData ve Coroutine",
+    "term": "suspend",
+    "answer": "Fonksiyonun coroutine içinde duraklatılıp devam edebileceğini belirtir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "suspend ne demektir?",
+    "ezber": "Fonksiyonun coroutine içinde duraklatılıp devam edebileceğini belirtir."
+  },
+  {
+    "id": "r080a",
+    "question": "Retrofit nedir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Retrofit",
+    "answer": "REST API istekleri yapmak için kullanılan HTTP istemci kütüphanesidir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Retrofit nedir?",
+    "ezber": "REST API istekleri yapmak için kullanılan HTTP istemci kütüphanesidir."
+  },
+  {
+    "id": "r080v1",
+    "question": "Sunucudan veri çekmek için Android’de hangi kütüphane kullanılır?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Retrofit",
+    "answer": "REST API istekleri yapmak için kullanılan HTTP istemci kütüphanesidir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Retrofit nedir?",
+    "ezber": "REST API istekleri yapmak için kullanılan HTTP istemci kütüphanesidir."
+  },
+  {
+    "id": "r081a",
+    "question": "JSON nedir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "JSON",
+    "answer": "Anahtar-değer yapısında veri taşıma formatıdır; API’lerde sık kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "JSON nedir?",
+    "ezber": "Anahtar-değer yapısında veri taşıma formatıdır; API’lerde sık kullanılır."
+  },
+  {
+    "id": "r081v1",
+    "question": "API’den gelen veri çoğunlukla hangi formatta olur?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "JSON",
+    "answer": "Anahtar-değer yapısında veri taşıma formatıdır; API’lerde sık kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "JSON nedir?",
+    "ezber": "Anahtar-değer yapısında veri taşıma formatıdır; API’lerde sık kullanılır."
+  },
+  {
+    "id": "r082a",
+    "question": "Parse etmek ne demektir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "parse",
+    "answer": "JSON/metin gibi veriyi programın kullanabileceği nesnelere dönüştürmektir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Parse etmek ne demektir?",
+    "ezber": "JSON/metin gibi veriyi programın kullanabileceği nesnelere dönüştürmektir."
+  },
+  {
+    "id": "r082v1",
+    "question": "JSON verisini model sınıfına çevirme işlemine ne denir?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "parse",
+    "answer": "JSON/metin gibi veriyi programın kullanabileceği nesnelere dönüştürmektir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Parse etmek ne demektir?",
+    "ezber": "JSON/metin gibi veriyi programın kullanabileceği nesnelere dönüştürmektir."
+  },
+  {
+    "id": "r083a",
+    "question": "Glide nedir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Glide",
+    "answer": "URL veya kaynaklardan resim yüklemek ve ImageView’da göstermek için kullanılan kütüphanedir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Glide nedir?",
+    "ezber": "URL veya kaynaklardan resim yüklemek ve ImageView’da göstermek için kullanılan kütüphanedir."
+  },
+  {
+    "id": "r083v1",
+    "question": "İnternetten resim yükleme kütüphanesi nedir?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Glide",
+    "answer": "URL veya kaynaklardan resim yüklemek ve ImageView’da göstermek için kullanılan kütüphanedir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Glide nedir?",
+    "ezber": "URL veya kaynaklardan resim yüklemek ve ImageView’da göstermek için kullanılan kütüphanedir."
+  },
+  {
+    "id": "r084a",
+    "question": "WorkManager nedir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "WorkManager",
+    "answer": "Ertelenebilir ve garanti edilmesi gereken arka plan işlerini yönetir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "WorkManager nedir?",
+    "ezber": "Ertelenebilir ve garanti edilmesi gereken arka plan işlerini yönetir."
+  },
+  {
+    "id": "r084v1",
+    "question": "Arka planda periyodik/garantili iş için ne kullanılır?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "WorkManager",
+    "answer": "Ertelenebilir ve garanti edilmesi gereken arka plan işlerini yönetir.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "WorkManager nedir?",
+    "ezber": "Ertelenebilir ve garanti edilmesi gereken arka plan işlerini yönetir."
+  },
+  {
+    "id": "r085a",
+    "question": "Notification nedir?",
+    "type": "Ana soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Notification",
+    "answer": "Kullanıcıya bildirim çubuğunda mesaj göstermeyi sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Notification nedir?",
+    "ezber": "Kullanıcıya bildirim çubuğunda mesaj göstermeyi sağlar."
+  },
+  {
+    "id": "r085v1",
+    "question": "Telefon bildirimleri hangi yapı ile oluşturulur?",
+    "type": "Alternatif soru",
+    "category": "6) API, JSON, Görsel Yükleme ve Arka Plan İşleri",
+    "term": "Notification",
+    "answer": "Kullanıcıya bildirim çubuğunda mesaj göstermeyi sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Notification nedir?",
+    "ezber": "Kullanıcıya bildirim çubuğunda mesaj göstermeyi sağlar."
+  },
+  {
+    "id": "r086a",
+    "question": "Firebase nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Firebase",
+    "answer": "Google’ın mobil/web uygulamalar için sunduğu bulut servisleri platformudur. Kimlik doğrulama, veritabanı, depolama, mesajlaşma gibi servisler sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Firebase nedir?",
+    "ezber": "Google’ın mobil/web uygulamalar için sunduğu bulut servisleri platformudur. Kimlik doğrulama, veritabanı, depolama, mesajlaşma gibi servisler sağlar."
+  },
+  {
+    "id": "r086v1",
+    "question": "Google’ın mobil backend platformu nedir?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Firebase",
+    "answer": "Google’ın mobil/web uygulamalar için sunduğu bulut servisleri platformudur. Kimlik doğrulama, veritabanı, depolama, mesajlaşma gibi servisler sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Firebase nedir?",
+    "ezber": "Google’ın mobil/web uygulamalar için sunduğu bulut servisleri platformudur. Kimlik doğrulama, veritabanı, depolama, mesajlaşma gibi servisler sağlar."
+  },
+  {
+    "id": "r087a",
+    "question": "Firestore nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Firestore",
+    "answer": "Firebase’in bulut NoSQL veritabanıdır; koleksiyon ve doküman yapısıyla çalışır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Firestore nedir?",
+    "ezber": "Firebase’in bulut NoSQL veritabanıdır; koleksiyon ve doküman yapısıyla çalışır."
+  },
+  {
+    "id": "r087v1",
+    "question": "Firebase’te bulut veritabanı hangisidir?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Firestore",
+    "answer": "Firebase’in bulut NoSQL veritabanıdır; koleksiyon ve doküman yapısıyla çalışır.",
+    "hint": "",
+    "code": "",
+    "page": 5,
+    "primaryQuestion": "Firestore nedir?",
+    "ezber": "Firebase’in bulut NoSQL veritabanıdır; koleksiyon ve doküman yapısıyla çalışır."
+  },
+  {
+    "id": "r088a",
+    "question": "Firebase Storage nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Storage",
+    "answer": "Resim, video, dosya gibi büyük medya dosyalarını bulutta saklar.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Firebase Storage nedir?",
+    "ezber": "Resim, video, dosya gibi büyük medya dosyalarını bulutta saklar."
+  },
+  {
+    "id": "r088v1",
+    "question": "Firebase’te dosya/resim yükleme servisi nedir?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Storage",
+    "answer": "Resim, video, dosya gibi büyük medya dosyalarını bulutta saklar.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Firebase Storage nedir?",
+    "ezber": "Resim, video, dosya gibi büyük medya dosyalarını bulutta saklar."
+  },
+  {
+    "id": "r089a",
+    "question": "Firebase Cloud Messaging nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Messaging",
+    "answer": "Push notification/bildirim göndermek için kullanılan Firebase servisidir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Firebase Cloud Messaging nedir?",
+    "ezber": "Push notification/bildirim göndermek için kullanılan Firebase servisidir."
+  },
+  {
+    "id": "r089v1",
+    "question": "Uzak bildirim göndermek için hangi Firebase servisi kullanılır?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "Messaging",
+    "answer": "Push notification/bildirim göndermek için kullanılan Firebase servisidir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Firebase Cloud Messaging nedir?",
+    "ezber": "Push notification/bildirim göndermek için kullanılan Firebase servisidir."
+  },
+  {
+    "id": "r090a",
+    "question": "Kayıt işlemi nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "kayıt",
+    "answer": "Kullanıcının sisteme yeni hesap oluşturmasıdır. Firebase Authentication ile e-posta/şifre kaydı yapılabilir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Kayıt işlemi nedir?",
+    "ezber": "Kullanıcının sisteme yeni hesap oluşturmasıdır. Firebase Authentication ile e-posta/şifre kaydı yapılabilir."
+  },
+  {
+    "id": "r090v1",
+    "question": "Sign up / register ne demektir?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "kayıt",
+    "answer": "Kullanıcının sisteme yeni hesap oluşturmasıdır. Firebase Authentication ile e-posta/şifre kaydı yapılabilir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Kayıt işlemi nedir?",
+    "ezber": "Kullanıcının sisteme yeni hesap oluşturmasıdır. Firebase Authentication ile e-posta/şifre kaydı yapılabilir."
+  },
+  {
+    "id": "r091a",
+    "question": "Giriş işlemi nedir?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "giriş",
+    "answer": "Kullanıcının mevcut hesabıyla sisteme oturum açmasıdır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Giriş işlemi nedir?",
+    "ezber": "Kullanıcının mevcut hesabıyla sisteme oturum açmasıdır."
+  },
+  {
+    "id": "r091v1",
+    "question": "Login / sign in ne demektir?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "giriş",
+    "answer": "Kullanıcının mevcut hesabıyla sisteme oturum açmasıdır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Giriş işlemi nedir?",
+    "ezber": "Kullanıcının mevcut hesabıyla sisteme oturum açmasıdır."
+  },
+  {
+    "id": "r092a",
+    "question": "signOut ne işe yarar?",
+    "type": "Ana soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "signOut",
+    "answer": "Oturum açmış kullanıcının çıkış yapmasını sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "signOut ne işe yarar?",
+    "ezber": "Oturum açmış kullanıcının çıkış yapmasını sağlar."
+  },
+  {
+    "id": "r092v1",
+    "question": "Firebase’te kullanıcı çıkışı hangi metotla yapılır?",
+    "type": "Alternatif soru",
+    "category": "7) Firebase ve Kullanıcı İşlemleri",
+    "term": "signOut",
+    "answer": "Oturum açmış kullanıcının çıkış yapmasını sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "signOut ne işe yarar?",
+    "ezber": "Oturum açmış kullanıcının çıkış yapmasını sağlar."
+  },
+  {
+    "id": "r093a",
+    "question": "strings.xml ne işe yarar?",
+    "type": "Ana soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "strings.xml",
+    "answer": "Uygulamada kullanılan metinleri merkezi kaynak olarak saklar. Çoklu dil desteğini kolaylaştırır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "strings.xml ne işe yarar?",
+    "ezber": "Uygulamada kullanılan metinleri merkezi kaynak olarak saklar. Çoklu dil desteğini kolaylaştırır."
+  },
+  {
+    "id": "r093v1",
+    "question": "Yazıları kod içine gömmek yerine nerede tutarız?",
+    "type": "Alternatif soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "strings.xml",
+    "answer": "Uygulamada kullanılan metinleri merkezi kaynak olarak saklar. Çoklu dil desteğini kolaylaştırır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "strings.xml ne işe yarar?",
+    "ezber": "Uygulamada kullanılan metinleri merkezi kaynak olarak saklar. Çoklu dil desteğini kolaylaştırır."
+  },
+  {
+    "id": "r094a",
+    "question": "drawable klasörü ne içerir?",
+    "type": "Ana soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "drawable",
+    "answer": "Resim, ikon, şekil ve çizilebilir kaynakları içerir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "drawable klasörü ne içerir?",
+    "ezber": "Resim, ikon, şekil ve çizilebilir kaynakları içerir."
+  },
+  {
+    "id": "r094v1",
+    "question": "Görseller hangi kaynak klasöründe tutulur?",
+    "type": "Alternatif soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "drawable",
+    "answer": "Resim, ikon, şekil ve çizilebilir kaynakları içerir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "drawable klasörü ne içerir?",
+    "ezber": "Resim, ikon, şekil ve çizilebilir kaynakları içerir."
+  },
+  {
+    "id": "r095a",
+    "question": "Bundle ile Intent verisi nasıl taşınır?",
+    "type": "Ana soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "Bundle",
+    "answer": "putExtra veya Bundle içine anahtar-değer eklenir; diğer Activity/Fragment bu anahtarla veriyi okur.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Bundle ile Intent verisi nasıl taşınır?",
+    "ezber": "putExtra veya Bundle içine anahtar-değer eklenir; diğer Activity/Fragment bu anahtarla veriyi okur."
+  },
+  {
+    "id": "r095v1",
+    "question": "Ekranlar arası veri aktarımı nasıl yapılır?",
+    "type": "Alternatif soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "Bundle",
+    "answer": "putExtra veya Bundle içine anahtar-değer eklenir; diğer Activity/Fragment bu anahtarla veriyi okur.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Bundle ile Intent verisi nasıl taşınır?",
+    "ezber": "putExtra veya Bundle içine anahtar-değer eklenir; diğer Activity/Fragment bu anahtarla veriyi okur."
+  },
+  {
+    "id": "r096a",
+    "question": "Keystore nedir?",
+    "type": "Ana soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "keystore",
+    "answer": "Uygulamayı imzalamak için kullanılan anahtar dosyasıdır. Yayınlama/release APK-AAB için gereklidir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Keystore nedir?",
+    "ezber": "Uygulamayı imzalamak için kullanılan anahtar dosyasıdır. Yayınlama/release APK-AAB için gereklidir."
+  },
+  {
+    "id": "r096v1",
+    "question": "Play Store’a yüklemeden önce uygulama ne ile imzalanır?",
+    "type": "Alternatif soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "keystore",
+    "answer": "Uygulamayı imzalamak için kullanılan anahtar dosyasıdır. Yayınlama/release APK-AAB için gereklidir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Keystore nedir?",
+    "ezber": "Uygulamayı imzalamak için kullanılan anahtar dosyasıdır. Yayınlama/release APK-AAB için gereklidir."
+  },
+  {
+    "id": "r097a",
+    "question": "Google’ın Android’de rolü nedir?",
+    "type": "Ana soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "Google",
+    "answer": "Android’i geliştiren ve Firebase, Play Services, Play Store gibi servisleri sağlayan şirkettir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Google’ın Android’de rolü nedir?",
+    "ezber": "Android’i geliştiren ve Firebase, Play Services, Play Store gibi servisleri sağlayan şirkettir."
+  },
+  {
+    "id": "r097v1",
+    "question": "Android ve Firebase hangi şirketle ilişkilidir?",
+    "type": "Alternatif soru",
+    "category": "8) Kaynak Dosyaları, Paketleme ve Yayınlama",
+    "term": "Google",
+    "answer": "Android’i geliştiren ve Firebase, Play Services, Play Store gibi servisleri sağlayan şirkettir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Google’ın Android’de rolü nedir?",
+    "ezber": "Android’i geliştiren ve Firebase, Play Services, Play Store gibi servisleri sağlayan şirkettir."
+  },
+  {
+    "id": "r098a",
+    "question": "val - var farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "val - var farkı",
+    "answer": "val sabittir, var değişkendir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "val - var farkı nedir?",
+    "ezber": "val sabittir, var değişkendir."
+  },
+  {
+    "id": "r099a",
+    "question": "String? ile String farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "String? ile String farkı",
+    "answer": "String null olamaz; String? null olabilir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "String? ile String farkı nedir?",
+    "ezber": "String null olamaz; String? null olabilir."
+  },
+  {
+    "id": "r100a",
+    "question": "?. ile ?: farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "?. ile ?: farkı",
+    "answer": "?. güvenli erişim yapar; ?: null durumunda varsayılan değer verir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "?. ile ?: farkı nedir?",
+    "ezber": "?. güvenli erişim yapar; ?: null durumunda varsayılan değer verir."
+  },
+  {
+    "id": "r101a",
+    "question": "Activity - Fragment farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Activity - Fragment farkı",
+    "answer": "Activity bağımsız ekran bileşenidir; Fragment Activity içinde çalışan parça ekrandır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Activity - Fragment farkı nedir?",
+    "ezber": "Activity bağımsız ekran bileşenidir; Fragment Activity içinde çalışan parça ekrandır."
+  },
+  {
+    "id": "r102a",
+    "question": "Intent - Bundle farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Intent - Bundle farkı",
+    "answer": "Intent bileşen başlatır/veri taşır; Bundle anahtar-değer veri paketidir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Intent - Bundle farkı nedir?",
+    "ezber": "Intent bileşen başlatır/veri taşır; Bundle anahtar-değer veri paketidir."
+  },
+  {
+    "id": "r103a",
+    "question": "LinearLayout - ConstraintLayout farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "LinearLayout - ConstraintLayout farkı",
+    "answer": "LinearLayout sıralı dizer; ConstraintLayout kısıtlarla esnek konumlandırır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "LinearLayout - ConstraintLayout farkı nedir?",
+    "ezber": "LinearLayout sıralı dizer; ConstraintLayout kısıtlarla esnek konumlandırır."
+  },
+  {
+    "id": "r104a",
+    "question": "RecyclerView için gerekli üçlü nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "RecyclerView için gerekli üçlü",
+    "answer": "RecyclerView + Adapter + ViewHolder.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "RecyclerView için gerekli üçlü nedir?",
+    "ezber": "RecyclerView + Adapter + ViewHolder."
+  },
+  {
+    "id": "r105a",
+    "question": "Room için gerekli üçlü nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Room için gerekli üçlü",
+    "answer": "Entity + DAO + Database. Bu listede Entity ve DAO özellikle sorulabilir.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Room için gerekli üçlü nedir?",
+    "ezber": "Entity + DAO + Database. Bu listede Entity ve DAO özellikle sorulabilir."
+  },
+  {
+    "id": "r106a",
+    "question": "MVVM üçlüsü nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "MVVM üçlüsü",
+    "answer": "Model + View + ViewModel.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "MVVM üçlüsü nedir?",
+    "ezber": "Model + View + ViewModel."
+  },
+  {
+    "id": "r107a",
+    "question": "API için temel akış nasıldır?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "API için temel akış",
+    "answer": "Retrofit ile istek yapılır, JSON gelir, parse edilip modele çevrilir, ViewModel/LiveData ile ekrana aktarılır.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "API için temel akış nasıldır?",
+    "ezber": "Retrofit ile istek yapılır, JSON gelir, parse edilip modele çevrilir, ViewModel/LiveData ile ekrana aktarılır."
+  },
+  {
+    "id": "r108a",
+    "question": "Firebase servis eşleştirme nasıldır?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Firebase servis eşleştirme",
+    "answer": "Auth: kayıt/giriş/çıkış, Firestore: veritabanı, Storage: dosya, Messaging: bildirim.",
+    "hint": "",
+    "code": "",
+    "page": 6,
+    "primaryQuestion": "Firebase servis eşleştirme nasıldır?",
+    "ezber": "Auth: kayıt/giriş/çıkış, Firestore: veritabanı, Storage: dosya, Messaging: bildirim."
+  },
+  {
+    "id": "r109a",
+    "question": "Manifest internet izin örneği nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Manifest izin örneği",
+    "answer": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "hint": "",
+    "code": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "page": 6,
+    "primaryQuestion": "Manifest internet izin örneği nedir?",
+    "ezber": "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+  },
+  {
+    "id": "r110a",
+    "question": "onCreate - onCreateView farkı nedir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "onCreate - onCreateView farkı",
+    "answer": "onCreate Activity/Fragment oluşturulurken; onCreateView Fragment arayüzü oluşturulurken kullanılır.",
+    "hint": "",
+    "code": "",
+    "page": 7,
+    "primaryQuestion": "onCreate - onCreateView farkı nedir?",
+    "ezber": "onCreate Activity/Fragment oluşturulurken; onCreateView Fragment arayüzü oluşturulurken kullanılır."
+  },
+  {
+    "id": "r111a",
+    "question": "notifyDataSetChanged ne zaman kullanılır?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "notifyDataSetChanged zamanı",
+    "answer": "Liste verisi değiştikten sonra Adapter’a ekranı yeniletmek için.",
+    "hint": "",
+    "code": "",
+    "page": 7,
+    "primaryQuestion": "notifyDataSetChanged ne zaman kullanılır?",
+    "ezber": "Liste verisi değiştikten sonra Adapter’a ekranı yeniletmek için."
+  },
+  {
+    "id": "r112a",
+    "question": "Logcat neden önemlidir?",
+    "type": "Ezber tablo",
+    "category": "9) Çok Kısa Ezber Cevaplar",
+    "term": "Logcat önemi",
+    "answer": "Hata, crash ve debug mesajlarını görmeyi sağlar.",
+    "hint": "",
+    "code": "",
+    "page": 7,
+    "primaryQuestion": "Logcat neden önemlidir?",
+    "ezber": "Hata, crash ve debug mesajlarını görmeyi sağlar."
+  },
+  {
+    "id": "r113a",
+    "question": "Aşağıdaki Kotlin değişken tanımlama kodu neyi gösterir?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Kotlin değişken tanımlama",
+    "answer": "val ile sabit, var ile değiştirilebilir değişken tanımlanır. String metin, Int tam sayı tutar.",
+    "hint": "",
+    "code": "val ad: String = \"Ali\"\nvar yas: Int = 20",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Kotlin değişken tanımlama kodu neyi gösterir?",
+    "ezber": "val ile sabit, var ile değiştirilebilir değişken tanımlanır. String metin, Int tam sayı tutar."
+  },
+  {
+    "id": "r113v1",
+    "question": "Kotlin’de val ve var ile değişken nasıl tanımlanır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Kotlin değişken tanımlama",
+    "answer": "val ile sabit, var ile değiştirilebilir değişken tanımlanır. String metin, Int tam sayı tutar.",
+    "hint": "",
+    "code": "val ad: String = \"Ali\"\nvar yas: Int = 20",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Kotlin değişken tanımlama kodu neyi gösterir?",
+    "ezber": "val ile sabit, var ile değiştirilebilir değişken tanımlanır. String metin, Int tam sayı tutar."
+  },
+  {
+    "id": "r114a",
+    "question": "Aşağıdaki nullable değişken örneği ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Nullable örnek",
+    "answer": "String? değişkenin null olabileceğini gösterir. ad?.length güvenli erişim yapar, ?: null olursa 0 döndürür.",
+    "hint": "",
+    "code": "var ad: String? = null\nprintln(ad?.length ?: 0)",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki nullable değişken örneği ne işe yarar?",
+    "ezber": "String? değişkenin null olabileceğini gösterir. ad?.length güvenli erişim yapar, ?: null olursa 0 döndürür."
+  },
+  {
+    "id": "r114v1",
+    "question": "Nullable değişken örneği nasıldır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Nullable örnek",
+    "answer": "String? değişkenin null olabileceğini gösterir. ad?.length güvenli erişim yapar, ?: null olursa 0 döndürür.",
+    "hint": "",
+    "code": "var ad: String? = null\nprintln(ad?.length ?: 0)",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki nullable değişken örneği ne işe yarar?",
+    "ezber": "String? değişkenin null olabileceğini gösterir. ad?.length güvenli erişim yapar, ?: null olursa 0 döndürür."
+  },
+  {
+    "id": "r115a",
+    "question": "Aşağıdaki when kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "when örneği",
+    "answer": "not değerine göre çoklu koşul kontrolü yapar: 100 ise Tam, 50-99 ise Geçti, diğer durumlarda Kaldı yazdırır.",
+    "hint": "",
+    "code": "when(not) {\n 100 -> println(\"Tam\")\n in 50..99 -> println(\"Geçti\")\n else -> println(\"Kaldı\")\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki when kodu ne işe yarar?",
+    "ezber": "not değerine göre çoklu koşul kontrolü yapar: 100 ise Tam, 50-99 ise Geçti, diğer durumlarda Kaldı yazdırır."
+  },
+  {
+    "id": "r115v1",
+    "question": "Kotlin’de switch yerine kullanılan when örneği nasıldır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "when örneği",
+    "answer": "not değerine göre çoklu koşul kontrolü yapar: 100 ise Tam, 50-99 ise Geçti, diğer durumlarda Kaldı yazdırır.",
+    "hint": "",
+    "code": "when(not) {\n 100 -> println(\"Tam\")\n in 50..99 -> println(\"Geçti\")\n else -> println(\"Kaldı\")\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki when kodu ne işe yarar?",
+    "ezber": "not değerine göre çoklu koşul kontrolü yapar: 100 ise Tam, 50-99 ise Geçti, diğer durumlarda Kaldı yazdırır."
+  },
+  {
+    "id": "r116a",
+    "question": "Aşağıdaki Button tıklama kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Button tıklama",
+    "answer": "Butona tıklanınca Toast ile kısa süreli “Tıklandı” mesajı gösterir.",
+    "hint": "",
+    "code": "button.setOnClickListener {\n Toast.makeText(this, \"Tıklandı\", Toast.LENGTH_SHORT).show()\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Button tıklama kodu ne işe yarar?",
+    "ezber": "Butona tıklanınca Toast ile kısa süreli “Tıklandı” mesajı gösterir."
+  },
+  {
+    "id": "r116v1",
+    "question": "Butona tıklanınca işlem yapmak için kod nasıl yazılır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Button tıklama",
+    "answer": "Butona tıklanınca Toast ile kısa süreli “Tıklandı” mesajı gösterir.",
+    "hint": "",
+    "code": "button.setOnClickListener {\n Toast.makeText(this, \"Tıklandı\", Toast.LENGTH_SHORT).show()\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Button tıklama kodu ne işe yarar?",
+    "ezber": "Butona tıklanınca Toast ile kısa süreli “Tıklandı” mesajı gösterir."
+  },
+  {
+    "id": "r117a",
+    "question": "Aşağıdaki Intent kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Intent ile geçiş",
+    "answer": "IkinciActivity ekranını başlatır, putExtra ile “ad” anahtarına “Ali” bilgisini ekleyip diğer ekrana veri taşır.",
+    "hint": "",
+    "code": "val intent = Intent(this, IkinciActivity::class.java)\nintent.putExtra(\"ad\", \"Ali\")\nstartActivity(intent)",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Intent kodu ne işe yarar?",
+    "ezber": "IkinciActivity ekranını başlatır, putExtra ile “ad” anahtarına “Ali” bilgisini ekleyip diğer ekrana veri taşır."
+  },
+  {
+    "id": "r117v1",
+    "question": "Intent ile ekrandan ekrana geçiş nasıl yapılır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Intent ile geçiş",
+    "answer": "IkinciActivity ekranını başlatır, putExtra ile “ad” anahtarına “Ali” bilgisini ekleyip diğer ekrana veri taşır.",
+    "hint": "",
+    "code": "val intent = Intent(this, IkinciActivity::class.java)\nintent.putExtra(\"ad\", \"Ali\")\nstartActivity(intent)",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Intent kodu ne işe yarar?",
+    "ezber": "IkinciActivity ekranını başlatır, putExtra ile “ad” anahtarına “Ali” bilgisini ekleyip diğer ekrana veri taşır."
+  },
+  {
+    "id": "r118a",
+    "question": "Aşağıdaki SharedPreferences kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "SharedPreferences kayıt",
+    "answer": "ayar adlı SharedPreferences dosyasına ad anahtarıyla Ali değerini kalıcı olarak kaydeder.",
+    "hint": "",
+    "code": "val sp = getSharedPreferences(\"ayar\", MODE_PRIVATE)\nsp.edit().putString(\"ad\", \"Ali\").apply()",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki SharedPreferences kodu ne işe yarar?",
+    "ezber": "ayar adlı SharedPreferences dosyasına ad anahtarıyla Ali değerini kalıcı olarak kaydeder."
+  },
+  {
+    "id": "r118v1",
+    "question": "SharedPreferences ile veri nasıl kaydedilir?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "SharedPreferences kayıt",
+    "answer": "ayar adlı SharedPreferences dosyasına ad anahtarıyla Ali değerini kalıcı olarak kaydeder.",
+    "hint": "",
+    "code": "val sp = getSharedPreferences(\"ayar\", MODE_PRIVATE)\nsp.edit().putString(\"ad\", \"Ali\").apply()",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki SharedPreferences kodu ne işe yarar?",
+    "ezber": "ayar adlı SharedPreferences dosyasına ad anahtarıyla Ali değerini kalıcı olarak kaydeder."
+  },
+  {
+    "id": "r119a",
+    "question": "Aşağıdaki Room DAO kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Room DAO örneği",
+    "answer": "UserDao arayüzünde kullanıcı ekleme için @Insert, kullanıcıları listeleme için @Query sorgusu tanımlar.",
+    "hint": "",
+    "code": "@Dao\ninterface UserDao {\n @Insert suspend fun ekle(user: User)\n @Query(\"SELECT * FROM User\") suspend fun listele(): List<User>\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Room DAO kodu ne işe yarar?",
+    "ezber": "UserDao arayüzünde kullanıcı ekleme için @Insert, kullanıcıları listeleme için @Query sorgusu tanımlar."
+  },
+  {
+    "id": "r119v1",
+    "question": "Room’da DAO içinde ekleme ve listeleme nasıl yazılır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Room DAO örneği",
+    "answer": "UserDao arayüzünde kullanıcı ekleme için @Insert, kullanıcıları listeleme için @Query sorgusu tanımlar.",
+    "hint": "",
+    "code": "@Dao\ninterface UserDao {\n @Insert suspend fun ekle(user: User)\n @Query(\"SELECT * FROM User\") suspend fun listele(): List<User>\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Room DAO kodu ne işe yarar?",
+    "ezber": "UserDao arayüzünde kullanıcı ekleme için @Insert, kullanıcıları listeleme için @Query sorgusu tanımlar."
+  },
+  {
+    "id": "r120a",
+    "question": "Aşağıdaki Coroutine kodu ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Coroutine örneği",
+    "answer": "viewModelScope.launch ile arka planda coroutine başlatır ve repository’den veriyi ana thread’i kilitlemeden getirir.",
+    "hint": "",
+    "code": "viewModelScope.launch {\n val sonuc = repository.veriGetir()\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Coroutine kodu ne işe yarar?",
+    "ezber": "viewModelScope.launch ile arka planda coroutine başlatır ve repository’den veriyi ana thread’i kilitlemeden getirir."
+  },
+  {
+    "id": "r120v1",
+    "question": "Coroutine ile veri çekme örneği nasıldır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Coroutine örneği",
+    "answer": "viewModelScope.launch ile arka planda coroutine başlatır ve repository’den veriyi ana thread’i kilitlemeden getirir.",
+    "hint": "",
+    "code": "viewModelScope.launch {\n val sonuc = repository.veriGetir()\n}",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Coroutine kodu ne işe yarar?",
+    "ezber": "viewModelScope.launch ile arka planda coroutine başlatır ve repository’den veriyi ana thread’i kilitlemeden getirir."
+  },
+  {
+    "id": "r121a",
+    "question": "Aşağıdaki Manifest internet izni ne işe yarar?",
+    "type": "Kod kartı",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Manifest internet izni",
+    "answer": "Uygulamanın internet kullanabilmesi için AndroidManifest.xml dosyasına eklenen izin satırıdır.",
+    "hint": "",
+    "code": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Manifest internet izni ne işe yarar?",
+    "ezber": "Uygulamanın internet kullanabilmesi için AndroidManifest.xml dosyasına eklenen izin satırıdır."
+  },
+  {
+    "id": "r121v1",
+    "question": "API/Retrofit kullanmak için Manifest’e hangi izin yazılır?",
+    "type": "Kod alternatifi",
+    "category": "10) Kod Parçalarıyla Sorulursa",
+    "term": "Manifest internet izni",
+    "answer": "Uygulamanın internet kullanabilmesi için AndroidManifest.xml dosyasına eklenen izin satırıdır.",
+    "hint": "",
+    "code": "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+    "page": 7,
+    "primaryQuestion": "Aşağıdaki Manifest internet izni ne işe yarar?",
+    "ezber": "Uygulamanın internet kullanabilmesi için AndroidManifest.xml dosyasına eklenen izin satırıdır."
+  }
+];
+
+    const els = {
+      body: document.body,
+      themeBtn: document.getElementById('themeBtn'),
+      totalCount: document.getElementById('totalCount'),
+      activeCount: document.getElementById('activeCount'),
+      doneCount: document.getElementById('doneCount'),
+      knownCount: document.getElementById('knownCount'),
+      unknownCount: document.getElementById('unknownCount'),
+      progressBar: document.getElementById('progressBar'),
+      searchInput: document.getElementById('searchInput'),
+      categorySelect: document.getElementById('categorySelect'),
+      shuffleBtn: document.getElementById('shuffleBtn'),
+      restartBtn: document.getElementById('restartBtn'),
+      emptyState: document.getElementById('emptyState'),
+      card: document.getElementById('card'),
+      termChip: document.getElementById('termChip'),
+      categoryChip: document.getElementById('categoryChip'),
+      typeChip: document.getElementById('typeChip'),
+      pageChip: document.getElementById('pageChip'),
+      statusChip: document.getElementById('statusChip'),
+      questionText: document.getElementById('questionText'),
+      answerBox: document.getElementById('answerBox'),
+      answerText: document.getElementById('answerText'),
+      codeWrap: document.getElementById('codeWrap'),
+      codeText: document.getElementById('codeText'),
+      memoryText: document.getElementById('memoryText'),
+      linkedTerm: document.getElementById('linkedTerm'),
+      primaryQuestion: document.getElementById('primaryQuestion'),
+      prevBtn: document.getElementById('prevBtn'),
+      showBtn: document.getElementById('showBtn'),
+      nextBtn: document.getElementById('nextBtn'),
+      knowBtn: document.getElementById('knowBtn'),
+      dontKnowBtn: document.getElementById('dontKnowBtn'),
+      clearCurrentBtn: document.getElementById('clearCurrentBtn'),
+      resetProgressBtn: document.getElementById('resetProgressBtn')
+    };
+
+    const STORAGE_KEY = 'android_mobil_programlama_calisma_takibi_v1';
+    const THEME_KEY = 'android_mobil_programlama_tema_v1';
+
+    let progress = loadProgress();
+    let filtered = [];
+    let position = 0;
+    let revealed = false;
+
+    function loadProgress() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveProgress() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+      } catch (e) {}
+    }
+
+    function normalizeText(value) {
+      return String(value || '')
+        .toLocaleLowerCase('tr-TR')
+        .replaceAll('ı', 'i')
+        .replaceAll('İ', 'i')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function searchable(card) {
+      return normalizeText([
+        card.question,
+        card.answer,
+        card.term,
+        card.category,
+        card.type,
+        card.hint,
+        card.code,
+        card.ezber,
+        card.primaryQuestion
+      ].join(' '));
+    }
+
+    function initCategories() {
+      const categories = [...new Set(ALL_CARDS.map(c => c.category))];
+      els.categorySelect.innerHTML = '<option value="all">Tüm bölümler / kategoriler</option>' +
+        categories.map(cat => `<option value="${escapeAttr(cat)}">${escapeHtml(cat)}</option>`).join('');
+    }
+
+    function applyFilters() {
+      const q = normalizeText(els.searchInput.value.trim());
+      const cat = els.categorySelect.value;
+      filtered = ALL_CARDS
+        .map((card, index) => ({ card, index }))
+        .filter(item => {
+          const okCategory = cat === 'all' || item.card.category === cat;
+          const okSearch = !q || searchable(item.card).includes(q);
+          return okCategory && okSearch;
+        })
+        .map(item => item.index);
+
+      position = 0;
+      revealed = false;
+      render();
+    }
+
+    function currentCard() {
+      if (!filtered.length) return null;
+      return ALL_CARDS[filtered[position]];
+    }
+
+    function render() {
+      els.totalCount.textContent = ALL_CARDS.length;
+      els.activeCount.textContent = filtered.length ? `${position + 1}/${filtered.length}` : `0/${filtered.length}`;
+
+      const known = Object.values(progress).filter(v => v === 'known').length;
+      const unknown = Object.values(progress).filter(v => v === 'unknown').length;
+      const done = known + unknown;
+      els.knownCount.textContent = known;
+      els.unknownCount.textContent = unknown;
+      els.doneCount.textContent = done;
+      els.progressBar.style.width = `${Math.round((done / ALL_CARDS.length) * 100)}%`;
+
+      const card = currentCard();
+      const hasCard = Boolean(card);
+      els.emptyState.style.display = hasCard ? 'none' : 'block';
+      els.card.style.display = hasCard ? 'block' : 'none';
+      document.querySelector('.actions').style.display = hasCard ? 'grid' : 'none';
+
+      if (!card) return;
+
+      els.termChip.textContent = `Kavram: ${card.term}`;
+      els.categoryChip.textContent = card.category;
+      els.typeChip.textContent = card.type;
+      els.pageChip.textContent = card.page ? `PDF s. ${card.page}` : 'PDF';
+      els.questionText.textContent = card.question;
+      els.answerText.textContent = card.answer;
+      els.memoryText.textContent = card.ezber || card.answer;
+      els.linkedTerm.textContent = card.term;
+      els.primaryQuestion.textContent = card.primaryQuestion || card.question;
+
+      if (card.code && card.code.trim()) {
+        els.codeWrap.style.display = 'block';
+        els.codeText.textContent = card.code;
+      } else {
+        els.codeWrap.style.display = 'none';
+        els.codeText.textContent = '';
+      }
+
+      const status = progress[card.id];
+      els.statusChip.className = 'chip ' + (status === 'known' ? 'known' : status === 'unknown' ? 'unknown' : 'pending');
+      els.statusChip.textContent = status === 'known' ? 'Durum: Biliyorum' : status === 'unknown' ? 'Durum: Bilmiyorum' : 'Durum: İşaretlenmedi';
+
+      els.answerBox.classList.toggle('show', revealed);
+      els.showBtn.textContent = revealed ? 'Cevabı Gizle' : 'Cevabı Göster';
+
+      els.prevBtn.disabled = position === 0;
+      els.nextBtn.disabled = position >= filtered.length - 1;
+    }
+
+    function showAnswer(toggle = true) {
+      revealed = toggle ? !revealed : true;
+      render();
+    }
+
+    function go(delta) {
+      if (!filtered.length) return;
+      position = Math.max(0, Math.min(filtered.length - 1, position + delta));
+      revealed = false;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setStatus(value) {
+      const card = currentCard();
+      if (!card) return;
+      progress[card.id] = value;
+      saveProgress();
+      render();
+    }
+
+    function clearCurrent() {
+      const card = currentCard();
+      if (!card) return;
+      delete progress[card.id];
+      saveProgress();
+      render();
+    }
+
+    function shuffle() {
+      for (let i = filtered.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
+      }
+      position = 0;
+      revealed = false;
+      render();
+    }
+
+    function restart() {
+      position = 0;
+      revealed = false;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProgress() {
+      const ok = confirm('Tüm Biliyorum/Bilmiyorum işaretleri silinsin mi?');
+      if (!ok) return;
+      progress = {};
+      saveProgress();
+      render();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function escapeAttr(str) {
+      return escapeHtml(str).replaceAll('`', '&#096;');
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'dark') {
+        document.body.classList.add('dark');
+      }
+      updateThemeButton();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      try {
+        localStorage.setItem(THEME_KEY, document.body.classList.contains('dark') ? 'dark' : 'light');
+      } catch (e) {}
+      updateThemeButton();
+    }
+
+    function updateThemeButton() {
+      els.themeBtn.textContent = document.body.classList.contains('dark') ? '☀️ Açık Tema' : '🌙 Karanlık Tema';
+    }
+
+    els.searchInput.addEventListener('input', applyFilters);
+    els.categorySelect.addEventListener('change', applyFilters);
+    els.shuffleBtn.addEventListener('click', shuffle);
+    els.restartBtn.addEventListener('click', restart);
+    els.prevBtn.addEventListener('click', () => go(-1));
+    els.nextBtn.addEventListener('click', () => go(1));
+    els.showBtn.addEventListener('click', () => showAnswer(true));
+    els.knowBtn.addEventListener('click', () => setStatus('known'));
+    els.dontKnowBtn.addEventListener('click', () => setStatus('unknown'));
+    els.clearCurrentBtn.addEventListener('click', clearCurrent);
+    els.resetProgressBtn.addEventListener('click', resetProgress);
+    els.themeBtn.addEventListener('click', toggleTheme);
+
+    els.card.addEventListener('click', (e) => {
+      if (e.target.closest('button, input, select, a')) return;
+      showAnswer(true);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement === els.searchInput) return;
+      if (e.key === 'ArrowRight') go(1);
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === ' ') {
+        e.preventDefault();
+        showAnswer(true);
+      }
+      if (e.key.toLocaleLowerCase('tr-TR') === 'b') setStatus('known');
+      if (e.key.toLocaleLowerCase('tr-TR') === 'x') setStatus('unknown');
+    });
+
+    initTheme();
+    initCategories();
+    applyFilters();
+  </script>
+</body>
+</html>
